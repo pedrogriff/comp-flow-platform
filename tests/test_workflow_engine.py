@@ -1,32 +1,31 @@
-"""Unit tests for end-to-end CompensationWorkflowEngine service."""
+"""Unit tests for In-Memory CompensationWorkflowEngine."""
 
 import unittest
 from decimal import Decimal
 
 from comp_flow.domain.models import (
-    CompensationReviewProposal,
     JobLevel,
     PerformanceRating,
     ReviewStatus,
 )
-from comp_flow.service.workflow_engine import CompensationWorkflowEngine
+from comp_flow.service.workflow_engine import CompensationWorkflowEngine, InMemProposal
 
 
 class TestWorkflowEngine(unittest.TestCase):
-    """Test suite for full review lifecycle orchestration."""
+    """Test suite for in-memory batch execution and state progression."""
 
     def setUp(self) -> None:
         self.engine = CompensationWorkflowEngine()
 
     def test_full_auto_approval_lifecycle(self) -> None:
         """Verifies Draft -> Submit & Audit -> Auto-Approved -> Finalized."""
-        proposal = CompensationReviewProposal(
+        proposal = InMemProposal(
             review_id="REV-200",
             employee_id="EMP-200",
             job_level=JobLevel.L6,
             current_base=Decimal("280000.00"),
             proposed_base=Decimal("300000.00"),
-            proposed_equity_gsus=1600,  # Within [1540, 2030] for EXCEEDS rating (Target: 1400)
+            proposed_equity_gsus=1600,  # Target: 1400
             performance_rating=PerformanceRating.EXCEEDS,
         )
 
@@ -44,7 +43,7 @@ class TestWorkflowEngine(unittest.TestCase):
 
     def test_full_vp_escalation_lifecycle(self) -> None:
         """Verifies Draft -> Submit -> VP Exception -> VP Approve -> Finalized."""
-        proposal = CompensationReviewProposal(
+        proposal = InMemProposal(
             review_id="REV-201",
             employee_id="EMP-201",
             job_level=JobLevel.L5,
@@ -59,7 +58,7 @@ class TestWorkflowEngine(unittest.TestCase):
         self.assertEqual(audited.status, ReviewStatus.VP_EXCEPTION_REQUIRED)
 
         # Executive approval
-        vp_approved = self.engine.approve_vp_exception("REV-201", vp_notes="Critical retention case approved by VP")
+        vp_approved = self.engine.approve_vp_exception("REV-201", vp_notes="Approved by VP")
         self.assertEqual(vp_approved.status, ReviewStatus.VP_APPROVED)
 
         # Finalize

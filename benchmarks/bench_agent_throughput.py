@@ -9,19 +9,15 @@ import random
 import time
 from decimal import Decimal
 
-from comp_flow.domain.models import (
-    CompensationReviewProposal,
-    JobLevel,
-    PerformanceRating,
-)
-from comp_flow.service.workflow_engine import CompensationWorkflowEngine
+from comp_flow.domain.models import JobLevel, PerformanceRating
+from comp_flow.service.workflow_engine import CompensationWorkflowEngine, InMemProposal
 
 
-def generate_synthetic_reviews(n: int) -> list[CompensationReviewProposal]:
+def generate_synthetic_reviews(n: int) -> list[InMemProposal]:
     """Generates a batch of synthetic compensation proposals."""
     levels = list(JobLevel)
     ratings = list(PerformanceRating)
-    proposals: list[CompensationReviewProposal] = []
+    proposals: list[InMemProposal] = []
 
     for i in range(n):
         lvl = random.choice(levels)
@@ -32,7 +28,7 @@ def generate_synthetic_reviews(n: int) -> list[CompensationReviewProposal]:
         equity = random.randint(300, 3500)
 
         proposals.append(
-            CompensationReviewProposal(
+            InMemProposal(
                 review_id=f"REV-{i:06d}",
                 employee_id=f"EMP-{i:06d}",
                 job_level=lvl,
