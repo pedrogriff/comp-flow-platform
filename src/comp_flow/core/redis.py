@@ -133,3 +133,12 @@ class RedisManager:
 
 
 redis_client = RedisManager()
+
+
+def get_redis() -> RedisManager:
+    """Dependency provider for RedisManager."""
+    return redis_client
+
+
+__all__ = ["RedisManager", "redis_client", "get_redis"]
+

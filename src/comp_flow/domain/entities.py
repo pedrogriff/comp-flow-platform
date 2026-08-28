@@ -25,6 +25,7 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
 
+from comp_flow.domain.benchmarks import BenchmarkSourceType, RadfordLevel
 from comp_flow.domain.models import (
     CycleStatus,
     JobFamily,
@@ -412,3 +413,78 @@ class AuditLog(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utc_now, nullable=False, index=True
     )
+
+
+class MarketBenchmark(Base):
+    """Compensation Market Benchmark Data Entity."""
+
+    __tablename__ = "market_benchmarks"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    soc_code: Mapped[str] = mapped_column(String(16), nullable=False, index=True)
+    job_family: Mapped[JobFamily] = mapped_column(
+        SQLEnum(JobFamily, name="benchmark_job_family_enum", native_enum=False),
+        nullable=False,
+        index=True,
+    )
+    job_level: Mapped[JobLevel] = mapped_column(
+        SQLEnum(JobLevel, name="benchmark_job_level_enum", native_enum=False),
+        nullable=False,
+        index=True,
+    )
+    radford_level: Mapped[RadfordLevel] = mapped_column(
+        SQLEnum(RadfordLevel, name="benchmark_radford_level_enum", native_enum=False),
+        nullable=False,
+        index=True,
+    )
+    geo_tier: Mapped[LocationTier] = mapped_column(
+        SQLEnum(LocationTier, name="benchmark_geo_tier_enum", native_enum=False),
+        nullable=False,
+        index=True,
+    )
+    metro_area: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    currency: Mapped[str] = mapped_column(String(3), default="USD", nullable=False)
+
+    p10_base: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    p25_base: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    p50_base: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    p75_base: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    p90_base: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+
+    target_bonus_pct: Mapped[Decimal] = mapped_column(
+        Numeric(5, 2), nullable=False, default=Decimal("15.00")
+    )
+    p50_equity_gsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    p75_equity_gsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+    sample_size: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    source_type: Mapped[BenchmarkSourceType] = mapped_column(
+        SQLEnum(BenchmarkSourceType, name="benchmark_source_type_enum", native_enum=False),
+        nullable=False,
+        default=BenchmarkSourceType.SYNTHETIC,
+        index=True,
+    )
+    effective_date: Mapped[date] = mapped_column(Date, nullable=False)
+    aged_to_date: Mapped[date] = mapped_column(Date, nullable=False)
+    annual_aging_rate: Mapped[Decimal] = mapped_column(
+        Numeric(5, 4), nullable=False, default=Decimal("0.0400")
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "job_family",
+            "job_level",
+            "geo_tier",
+            "source_type",
+            "effective_date",
+            name="uq_benchmark_family_level_geo_source",
+        ),
+    )
+

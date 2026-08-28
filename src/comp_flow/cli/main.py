@@ -11,7 +11,8 @@ import uvicorn
 
 from comp_flow.cli.seeder import seed_enterprise_data
 from comp_flow.core.config import settings
-from comp_flow.core.database import init_db
+from comp_flow.core.database import AsyncSessionLocal, init_db
+from comp_flow.etl.pipeline import BenchmarkETLPipeline
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,6 +38,30 @@ def seed_command(_args: argparse.Namespace) -> None:
     logger.info("Seeding enterprise demo data...")
     asyncio.run(seed_enterprise_data())
     logger.info("✅ Database seeding complete.")
+
+
+def benchmark_seed_command(_args: argparse.Namespace) -> None:
+    """Seeds database with 2026 market benchmarks."""
+    async def _run() -> None:
+        async with AsyncSessionLocal() as session:
+            pipeline = BenchmarkETLPipeline(session)
+            benchmarks = await pipeline.seed_market_benchmarks()
+            logger.info(f"✅ Seeded {len(benchmarks)} market benchmarks across all families and levels.")
+
+    asyncio.run(_run())
+
+
+def benchmark_ingest_command(args: argparse.Namespace) -> None:
+    """Ingests raw DOL LCA CSV dataset."""
+    async def _run() -> None:
+        with open(args.file, "r", encoding="utf-8") as f:
+            csv_text = f.read()
+        async with AsyncSessionLocal() as session:
+            pipeline = BenchmarkETLPipeline(session)
+            benchmarks = await pipeline.ingest_dol_lca_csv(csv_text)
+            logger.info(f"✅ Ingested and computed {len(benchmarks)} benchmarks from {args.file}.")
+
+    asyncio.run(_run())
 
 
 def init_db_command(_args: argparse.Namespace) -> None:
@@ -65,6 +90,17 @@ def build_parser() -> argparse.ArgumentParser:
         "seed", help="Seed database with realistic enterprise total rewards fixtures"
     )
 
+    # benchmark-seed
+    subparsers.add_parser(
+        "benchmark-seed", help="Seed database with 2026 market compensation benchmark percentiles"
+    )
+
+    # benchmark-ingest
+    bench_ingest_p = subparsers.add_parser(
+        "benchmark-ingest", help="Ingest raw DOL LCA / BLS wage disclosure CSV"
+    )
+    bench_ingest_p.add_argument("--file", type=str, required=True, help="Path to CSV file")
+
     # init-db
     subparsers.add_parser("init-db", help="Create database schema tables")
 
@@ -80,6 +116,10 @@ def main() -> None:
         serve_command(args)
     elif args.command == "seed":
         seed_command(args)
+    elif args.command == "benchmark-seed":
+        benchmark_seed_command(args)
+    elif args.command == "benchmark-ingest":
+        benchmark_ingest_command(args)
     elif args.command == "init-db":
         init_db_command(args)
     else:
@@ -89,3 +129,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
