@@ -62,7 +62,9 @@ class BenchmarkETLPipeline:
         for (family, level, geo), wages in cohorts.items():
             if len(wages) < BenchmarkStatisticalEngine.MIN_SAFE_HARBOR_COUNT:
                 # Do not emit benchmark if sample size violates Safe Harbor antitrust limits
-                logger.info(f"Skipping cohort ({family}, {level}, {geo}): sample size {len(wages)} < 5")
+                logger.info(
+                    f"Skipping cohort ({family}, {level}, {geo}): sample size {len(wages)} < 5"
+                )
                 continue
 
             raw_percentiles = BenchmarkStatisticalEngine.calculate_percentiles(wages)
@@ -76,11 +78,17 @@ class BenchmarkETLPipeline:
                 annual_rate=annual_aging_rate,
             )
 
-            radford = BenchmarkNormalizer.RADFORD_LEVEL_MAP.get(level, BenchmarkNormalizer.RADFORD_LEVEL_MAP[JobLevel.L5])
+            radford = BenchmarkNormalizer.RADFORD_LEVEL_MAP.get(
+                level, BenchmarkNormalizer.RADFORD_LEVEL_MAP[JobLevel.L5]
+            )
             soc = BenchmarkNormalizer.SOC_MAPPINGS.get(family, "15-1252.00")
 
             # Default bonus & equity guideline targets based on level
-            target_bonus = Decimal("10.00") if level == JobLevel.L3 else (Decimal("15.00") if level in (JobLevel.L4, JobLevel.L5) else Decimal("20.00"))
+            target_bonus = (
+                Decimal("10.00")
+                if level == JobLevel.L3
+                else (Decimal("15.00") if level in (JobLevel.L4, JobLevel.L5) else Decimal("20.00"))
+            )
             p50_eq = 400 if level == JobLevel.L3 else (900 if level == JobLevel.L5 else 1400)
 
             bench = MarketBenchmark(

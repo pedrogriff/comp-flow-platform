@@ -120,7 +120,9 @@ class BenchmarkService:
         # 2. Range Penetration: (Base - P10) / (P90 - P10) * 100
         spread = p90 - p10
         if spread > Decimal("0"):
-            range_penetration = (((base - p10) / spread) * Decimal("100.0")).quantize(Decimal("0.1"))
+            range_penetration = (((base - p10) / spread) * Decimal("100.0")).quantize(
+                Decimal("0.1")
+            )
         else:
             range_penetration = Decimal("50.0")
 
@@ -128,7 +130,9 @@ class BenchmarkService:
         percentile_est = self._estimate_market_percentile(base, benchmark)
 
         # 4. Total Target Cash
-        target_bonus = (base * (benchmark.target_bonus_pct / Decimal("100.0"))).quantize(Decimal("0.01"))
+        target_bonus = (base * (benchmark.target_bonus_pct / Decimal("100.0"))).quantize(
+            Decimal("0.01")
+        )
         ttc = base + target_bonus
         y1tc = ttc + signon
 
@@ -136,7 +140,7 @@ class BenchmarkService:
         # Median (P50) ~ 55% win rate, P75 ~ 82% win rate, P90 ~ 94% win rate
         win_rate = self._estimate_offer_win_rate(percentile_est)
 
-        within_band = (p10 <= base <= p90)
+        within_band = p10 <= base <= p90
 
         return BenchmarkComparisonResult(
             proposed_base=base,

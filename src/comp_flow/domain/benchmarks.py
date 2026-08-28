@@ -79,7 +79,9 @@ class MarketBenchmark(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    soc_code: str = Field(..., description="Standard Occupational Classification code (e.g. 15-1252.00)")
+    soc_code: str = Field(
+        ..., description="Standard Occupational Classification code (e.g. 15-1252.00)"
+    )
     job_family: JobFamily
     job_level: JobLevel
     radford_level: RadfordLevel
@@ -118,8 +120,14 @@ class BenchmarkComparisonResult(BaseModel):
     benchmark: MarketBenchmark
     compa_ratio: Decimal = Field(..., description="Proposed Base / Benchmark P50 (Midpoint)")
     range_penetration_pct: Decimal = Field(..., description="(Base - P10) / (P90 - P10) * 100")
-    market_percentile_estimate: Decimal = Field(..., description="Estimated market percentile [0-100]")
+    market_percentile_estimate: Decimal = Field(
+        ..., description="Estimated market percentile [0-100]"
+    )
     total_target_cash: Decimal = Field(..., description="Base + Calculated Target Bonus")
     first_year_direct_comp: Decimal = Field(..., description="TTC + Sign-on Bonus")
-    predicted_offer_win_rate: Decimal = Field(..., description="Estimated candidate acceptance rate [0-100%]")
-    within_market_band: bool = Field(..., description="True if proposed base is between P10 and P90")
+    predicted_offer_win_rate: Decimal = Field(
+        ..., description="Estimated candidate acceptance rate [0-100%]"
+    )
+    within_market_band: bool = Field(
+        ..., description="True if proposed base is between P10 and P90"
+    )

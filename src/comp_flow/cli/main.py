@@ -42,17 +42,21 @@ def seed_command(_args: argparse.Namespace) -> None:
 
 def benchmark_seed_command(_args: argparse.Namespace) -> None:
     """Seeds database with 2026 market benchmarks."""
+
     async def _run() -> None:
         async with AsyncSessionLocal() as session:
             pipeline = BenchmarkETLPipeline(session)
             benchmarks = await pipeline.seed_market_benchmarks()
-            logger.info(f"✅ Seeded {len(benchmarks)} market benchmarks across all families and levels.")
+            logger.info(
+                f"✅ Seeded {len(benchmarks)} market benchmarks across all families and levels."
+            )
 
     asyncio.run(_run())
 
 
 def benchmark_ingest_command(args: argparse.Namespace) -> None:
     """Ingests raw DOL LCA CSV dataset."""
+
     async def _run() -> None:
         with open(args.file, encoding="utf-8") as f:
             csv_text = f.read()
@@ -129,4 +133,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

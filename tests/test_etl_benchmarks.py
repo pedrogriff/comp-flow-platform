@@ -25,6 +25,7 @@ from comp_flow.service.benchmark_service import BenchmarkService
 
 # --- Normalization Tests ---
 
+
 def test_wage_unit_normalization():
     """Verifies hourly, monthly, weekly, and annual wage conversions."""
     hourly = BenchmarkNormalizer.normalize_wage(Decimal("100.00"), "HOUR")
@@ -81,10 +82,11 @@ def test_role_classification_and_radford_mapping():
 
 # --- Statistical Engine Tests ---
 
+
 def test_iqr_outlier_filtering():
     """Verifies Tukey's IQR rule strips extreme anomalous salary entries."""
     wages = [
-        Decimal("10000"),   # Extreme low outlier
+        Decimal("10000"),  # Extreme low outlier
         Decimal("180000"),
         Decimal("190000"),
         Decimal("200000"),
@@ -92,7 +94,7 @@ def test_iqr_outlier_filtering():
         Decimal("220000"),
         Decimal("230000"),
         Decimal("240000"),
-        Decimal("2000000"), # Extreme high outlier
+        Decimal("2000000"),  # Extreme high outlier
     ]
     cleaned = BenchmarkStatisticalEngine.filter_outliers_iqr(wages)
     assert Decimal("10000") not in cleaned
@@ -135,9 +137,27 @@ def test_survey_aging_compound_formula():
 def test_monotonic_smoothing():
     """Verifies monotonic correction when higher levels have noisy sample data."""
     level_data = {
-        "L3": BenchmarkPercentiles(p10_base=Decimal("120000"), p25_base=Decimal("140000"), p50_base=Decimal("160000"), p75_base=Decimal("180000"), p90_base=Decimal("200000")),
-        "L4": BenchmarkPercentiles(p10_base=Decimal("110000"), p25_base=Decimal("130000"), p50_base=Decimal("150000"), p75_base=Decimal("170000"), p90_base=Decimal("190000")), # Inverted!
-        "L5": BenchmarkPercentiles(p10_base=Decimal("180000"), p25_base=Decimal("210000"), p50_base=Decimal("240000"), p75_base=Decimal("270000"), p90_base=Decimal("300000")),
+        "L3": BenchmarkPercentiles(
+            p10_base=Decimal("120000"),
+            p25_base=Decimal("140000"),
+            p50_base=Decimal("160000"),
+            p75_base=Decimal("180000"),
+            p90_base=Decimal("200000"),
+        ),
+        "L4": BenchmarkPercentiles(
+            p10_base=Decimal("110000"),
+            p25_base=Decimal("130000"),
+            p50_base=Decimal("150000"),
+            p75_base=Decimal("170000"),
+            p90_base=Decimal("190000"),
+        ),  # Inverted!
+        "L5": BenchmarkPercentiles(
+            p10_base=Decimal("180000"),
+            p25_base=Decimal("210000"),
+            p50_base=Decimal("240000"),
+            p75_base=Decimal("270000"),
+            p90_base=Decimal("300000"),
+        ),
     }
     smoothed = BenchmarkStatisticalEngine.smooth_level_monotonicity(level_data)
     assert smoothed["L4"].p50_base >= smoothed["L3"].p50_base
@@ -145,6 +165,7 @@ def test_monotonic_smoothing():
 
 
 # --- DOL Parser Tests ---
+
 
 def test_dol_lca_csv_parser():
     """Verifies extraction and normalization of DOL OFLC CSV rows."""
@@ -167,6 +188,7 @@ I-200-24001-003,AMAZON.COM SERVICES LLC,Software Development Engineer II,15-1252
 
 # --- Seed Loader Tests ---
 
+
 def test_benchmark_seed_loader_matrix():
     """Verifies matrix generation across all 5 job families * 6 levels * 3 geo zones = 90 rows."""
     seeds = BenchmarkSeedLoader.generate_seed_benchmarks()
@@ -177,6 +199,7 @@ def test_benchmark_seed_loader_matrix():
 
 
 # --- Service & Analytics Tests ---
+
 
 def test_benchmark_service_compare():
     """Verifies compa-ratio, percentile rank, and offer win-rate predictions."""
@@ -228,6 +251,7 @@ def test_benchmark_service_compare():
 
 
 # --- Async Integration Test with SQLite DB ---
+
 
 @pytest.mark.asyncio
 async def test_end_to_end_etl_pipeline_with_db():

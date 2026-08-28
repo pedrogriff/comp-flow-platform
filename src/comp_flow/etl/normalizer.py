@@ -98,7 +98,9 @@ class BenchmarkNormalizer:
         return val.quantize(Decimal("0.01"))
 
     @classmethod
-    def normalize_geo_tier(cls, city: str | None, state: str | None, metro: str | None = None) -> LocationTier:
+    def normalize_geo_tier(
+        cls, city: str | None, state: str | None, metro: str | None = None
+    ) -> LocationTier:
         """Classifies city/state/metro into US_ZONE_1, US_ZONE_2, or US_ZONE_3."""
         text_tokens = " ".join(filter(None, [city, state, metro])).upper()
 
@@ -119,20 +121,54 @@ class BenchmarkNormalizer:
 
         # 1. Infer Job Family with high-specificity precedence
         family = JobFamily.SOFTWARE_ENGINEERING
-        if any(w in clean_title for w in ["MACHINE LEARNING", "ML ", "AI ", "DEEP LEARNING", "NLP", "COMPUTER VISION", "LLM"]):
+        if any(
+            w in clean_title
+            for w in [
+                "MACHINE LEARNING",
+                "ML ",
+                "AI ",
+                "DEEP LEARNING",
+                "NLP",
+                "COMPUTER VISION",
+                "LLM",
+            ]
+        ):
             family = JobFamily.MACHINE_LEARNING
-        elif any(w in clean_title for w in ["DATA SCIENTIST", "DATA SCIENCE", "ANALYTICS", "RESEARCH SCIENTIST"]):
+        elif any(
+            w in clean_title
+            for w in ["DATA SCIENTIST", "DATA SCIENCE", "ANALYTICS", "RESEARCH SCIENTIST"]
+        ):
             family = JobFamily.DATA_SCIENCE
-        elif any(w in clean_title for w in ["PRODUCT MANAGER", "PRODUCT MANAGEMENT", "TECHNICAL PROGRAM"]):
+        elif any(
+            w in clean_title for w in ["PRODUCT MANAGER", "PRODUCT MANAGEMENT", "TECHNICAL PROGRAM"]
+        ):
             family = JobFamily.PRODUCT_MANAGEMENT
-        elif any(w in clean_title for w in ["INFRA", "SYSTEMS", "DEVOPS", "SRE", "RELIABILITY", "KERNEL", "PLATFORM", "NETWORK", "SECURITY"]):
+        elif any(
+            w in clean_title
+            for w in [
+                "INFRA",
+                "SYSTEMS",
+                "DEVOPS",
+                "SRE",
+                "RELIABILITY",
+                "KERNEL",
+                "PLATFORM",
+                "NETWORK",
+                "SECURITY",
+            ]
+        ):
             family = JobFamily.SYSTEMS_INFRASTRUCTURE
 
         # 2. Infer Job Level
         level = JobLevel.L5  # Default baseline is Senior / Proficient
-        if any(w in clean_title for w in ["PRINCIPAL", "DISTINGUISHED", "FELLOW", "DIRECTOR", "L8"]):
+        if any(
+            w in clean_title for w in ["PRINCIPAL", "DISTINGUISHED", "FELLOW", "DIRECTOR", "L8"]
+        ):
             level = JobLevel.L8
-        elif any(w in clean_title for w in ["SR. STAFF", "SENIOR STAFF", "STAFF ARCHITECT", "PRINCIPAL ARCHITECT", "L7"]):
+        elif any(
+            w in clean_title
+            for w in ["SR. STAFF", "SENIOR STAFF", "STAFF ARCHITECT", "PRINCIPAL ARCHITECT", "L7"]
+        ):
             level = JobLevel.L7
         elif any(w in clean_title for w in ["STAFF", "LEAD", "ARCHITECT", "L6"]):
             level = JobLevel.L6
@@ -140,7 +176,9 @@ class BenchmarkNormalizer:
             level = JobLevel.L5
         elif any(w in clean_title for w in ["MID", "II", "INTERMEDIATE", "L4"]):
             level = JobLevel.L4
-        elif any(w in clean_title for w in ["JUNIOR", "JR.", "JR ", "ASSOCIATE", "ENTRY", "I", "L3"]):
+        elif any(
+            w in clean_title for w in ["JUNIOR", "JR.", "JR ", "ASSOCIATE", "ENTRY", "I", "L3"]
+        ):
             level = JobLevel.L3
 
         # Match specific level regex e.g. "SWE L6" or "Software Engineer 4"

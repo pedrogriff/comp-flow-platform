@@ -55,7 +55,11 @@ def upgrade() -> None:
             name="uq_benchmark_family_level_geo_source",
         ),
     )
-    op.create_index("ix_benchmark_lookup", "market_benchmarks", ["job_family", "job_level", "geo_tier", "is_active"])
+    op.create_index(
+        "ix_benchmark_lookup",
+        "market_benchmarks",
+        ["job_family", "job_level", "geo_tier", "is_active"],
+    )
 
 
 def downgrade() -> None:

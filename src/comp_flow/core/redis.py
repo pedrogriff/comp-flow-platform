@@ -141,4 +141,3 @@ def get_redis() -> RedisManager:
 
 
 __all__ = ["RedisManager", "redis_client", "get_redis"]
-

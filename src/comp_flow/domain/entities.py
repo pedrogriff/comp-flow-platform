@@ -487,4 +487,3 @@ class MarketBenchmark(Base):
             name="uq_benchmark_family_level_geo_source",
         ),
     )
-
