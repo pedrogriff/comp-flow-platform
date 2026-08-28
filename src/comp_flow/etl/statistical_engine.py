@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from datetime import date
 from decimal import Decimal
-from typing import Sequence
 
 from comp_flow.domain.benchmarks import BenchmarkPercentiles
 

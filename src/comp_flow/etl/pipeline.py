@@ -4,23 +4,20 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
+from collections.abc import Sequence
 from datetime import date
 from decimal import Decimal
-from typing import Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from comp_flow.domain.benchmarks import (
-    BenchmarkPercentiles,
     BenchmarkSourceType,
     MarketBenchmark,
-    RawWageObservation,
 )
 from comp_flow.domain.entities import MarketBenchmark as MarketBenchmarkEntity
 from comp_flow.domain.models import JobFamily, JobLevel, LocationTier
 from comp_flow.etl.normalizer import BenchmarkNormalizer
-from comp_flow.etl.sources.bls_oews_parser import BLSOEWSParser
 from comp_flow.etl.sources.dol_lca_parser import DOLLCAParser
 from comp_flow.etl.sources.seed_loader import BenchmarkSeedLoader
 from comp_flow.etl.statistical_engine import BenchmarkStatisticalEngine

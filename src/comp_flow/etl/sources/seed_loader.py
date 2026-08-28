@@ -5,6 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import date
 from decimal import Decimal
+from typing import Any
 
 from comp_flow.domain.benchmarks import BenchmarkSourceType, MarketBenchmark, RadfordLevel
 from comp_flow.domain.models import JobFamily, JobLevel, LocationTier

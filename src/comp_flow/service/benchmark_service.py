@@ -5,8 +5,6 @@ from __future__ import annotations
 import json
 import logging
 from decimal import Decimal
-from typing import Sequence
-from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -71,6 +69,7 @@ class BenchmarkService:
 
         if self.redis:
             try:
+                dump_data = benchmark.model_dump(mode="json")
                 await self.redis.set(
                     cache_key, json.dumps(dump_data), expire_seconds=self.CACHE_TTL_SECONDS
                 )

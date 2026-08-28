@@ -6,7 +6,6 @@ import csv
 import io
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Iterator
 
 from comp_flow.domain.benchmarks import RawWageObservation
 from comp_flow.etl.normalizer import BenchmarkNormalizer

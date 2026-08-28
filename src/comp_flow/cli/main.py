@@ -54,7 +54,7 @@ def benchmark_seed_command(_args: argparse.Namespace) -> None:
 def benchmark_ingest_command(args: argparse.Namespace) -> None:
     """Ingests raw DOL LCA CSV dataset."""
     async def _run() -> None:
-        with open(args.file, "r", encoding="utf-8") as f:
+        with open(args.file, encoding="utf-8") as f:
             csv_text = f.read()
         async with AsyncSessionLocal() as session:
             pipeline = BenchmarkETLPipeline(session)

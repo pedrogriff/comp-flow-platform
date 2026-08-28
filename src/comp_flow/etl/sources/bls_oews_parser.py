@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import csv
 import io
-from datetime import date
 from decimal import Decimal
 
 from comp_flow.domain.benchmarks import BenchmarkPercentiles

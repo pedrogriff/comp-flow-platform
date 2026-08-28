@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from decimal import Decimal
+
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from comp_flow.core.database import get_db
-from comp_flow.core.redis import get_redis, RedisManager
+from comp_flow.core.redis import RedisManager, get_redis
 from comp_flow.core.security import get_current_user, require_roles
 from comp_flow.domain.benchmarks import (
     BenchmarkComparisonResult,
