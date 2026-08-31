@@ -420,3 +420,33 @@ def calculate_offer_total_comp(
         "total_target_cash": total_target_cash,
         "first_year_total_comp": first_year_total_comp,
     }
+
+
+def evaluate_market_benchmark_positioning(
+    proposed_base: Decimal,
+    p10_base: Decimal,
+    p50_base: Decimal,
+    p90_base: Decimal,
+) -> AuditFinding:
+    """Evaluates proposed base salary against market percentiles (P10, P50, P90)."""
+    compa_ratio = (proposed_base / p50_base).quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
+    if proposed_base < p10_base:
+        return AuditFinding(
+            check_name="MARKET_BENCHMARK_ALIGNMENT",
+            passed=False,
+            details=f"Proposed base ${proposed_base:,.2f} is below market 10th percentile (${p10_base:,.2f}, Market Compa: {compa_ratio})",
+            severity="WARNING",
+        )
+    elif proposed_base > p90_base:
+        return AuditFinding(
+            check_name="MARKET_BENCHMARK_ALIGNMENT",
+            passed=False,
+            details=f"Proposed base ${proposed_base:,.2f} exceeds market 90th percentile (${p90_base:,.2f}, Market Compa: {compa_ratio})",
+            severity="WARNING",
+        )
+    return AuditFinding(
+        check_name="MARKET_BENCHMARK_ALIGNMENT",
+        passed=True,
+        details=f"Proposed base ${proposed_base:,.2f} is aligned with market P10-P90 range (Market Compa: {compa_ratio})",
+        severity="INFO",
+    )

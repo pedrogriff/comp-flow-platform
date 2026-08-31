@@ -17,6 +17,7 @@ from comp_flow.tools.registry import (
     evaluate_bonus_compliance,
     evaluate_candidate_offer_compliance,
     evaluate_equity_guidelines,
+    evaluate_market_benchmark_positioning,
     evaluate_promotion_compliance,
     get_default_salary_band,
     verify_salary_band_compliance,
@@ -199,6 +200,27 @@ class TestCompensationTools(unittest.TestCase):
         self.assertEqual(totals["total_target_cash"], Decimal("230000.00"))
         # First year total comp = 200k + 30k + 30k + (1200 * 0.33333333 * 150 = ~60,000) = $320,000.00
         self.assertEqual(totals["first_year_total_comp"], Decimal("320000.00"))
+
+    def test_market_benchmark_positioning(self) -> None:
+        """Verifies market benchmark percentile alignment evaluation."""
+        p10 = Decimal("200000.00")
+        p50 = Decimal("250000.00")
+        p90 = Decimal("300000.00")
+
+        # Aligned
+        finding_ok = evaluate_market_benchmark_positioning(Decimal("250000.00"), p10, p50, p90)
+        self.assertTrue(finding_ok.passed)
+        self.assertEqual(finding_ok.severity, "INFO")
+
+        # Below P10
+        finding_low = evaluate_market_benchmark_positioning(Decimal("180000.00"), p10, p50, p90)
+        self.assertFalse(finding_low.passed)
+        self.assertEqual(finding_low.severity, "WARNING")
+
+        # Above P90
+        finding_high = evaluate_market_benchmark_positioning(Decimal("350000.00"), p10, p50, p90)
+        self.assertFalse(finding_high.passed)
+        self.assertEqual(finding_high.severity, "WARNING")
 
 
 if __name__ == "__main__":
