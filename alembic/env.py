@@ -18,7 +18,10 @@ config = context.config
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    try:
+        fileConfig(config.config_file_name)
+    except Exception:
+        pass
 
 # Set database URL from application settings
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
