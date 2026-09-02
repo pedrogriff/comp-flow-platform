@@ -25,7 +25,7 @@ class TestWorkflowEngine(unittest.TestCase):
             job_level=JobLevel.L6,
             current_base=Decimal("280000.00"),
             proposed_base=Decimal("300000.00"),
-            proposed_equity_gsus=1600,  # Target: 1400
+            proposed_equity_rsus=1600,  # Target: 1400
             performance_rating=PerformanceRating.EXCEEDS,
         )
 
@@ -49,7 +49,7 @@ class TestWorkflowEngine(unittest.TestCase):
             job_level=JobLevel.L5,
             current_base=Decimal("220000.00"),
             proposed_base=Decimal("295000.00"),  # Exceeds max ($290k)
-            proposed_equity_gsus=900,
+            proposed_equity_rsus=900,
             performance_rating=PerformanceRating.SUPERB,
         )
 

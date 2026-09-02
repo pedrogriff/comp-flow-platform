@@ -94,8 +94,8 @@ class BenchmarkStatisticalEngine:
             p75_base=(percentiles.p75_base * multiplier).quantize(Decimal("0.01")),
             p90_base=(percentiles.p90_base * multiplier).quantize(Decimal("0.01")),
             target_bonus_pct=percentiles.target_bonus_pct,
-            p50_equity_gsus=percentiles.p50_equity_gsus,
-            p75_equity_gsus=percentiles.p75_equity_gsus,
+            p50_equity_rsus=percentiles.p50_equity_rsus,
+            p75_equity_rsus=percentiles.p75_equity_rsus,
             sample_size=percentiles.sample_size,
         )
 
@@ -126,8 +126,8 @@ class BenchmarkStatisticalEngine:
                     p75_base=(curr.p75_base * adjustment_ratio).quantize(Decimal("0.01")),
                     p90_base=(curr.p90_base * adjustment_ratio).quantize(Decimal("0.01")),
                     target_bonus_pct=curr.target_bonus_pct,
-                    p50_equity_gsus=curr.p50_equity_gsus,
-                    p75_equity_gsus=curr.p75_equity_gsus,
+                    p50_equity_rsus=curr.p50_equity_rsus,
+                    p75_equity_rsus=curr.p75_equity_rsus,
                     sample_size=curr.sample_size,
                 )
 

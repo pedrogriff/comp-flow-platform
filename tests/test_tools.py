@@ -99,9 +99,9 @@ class TestCompensationTools(unittest.TestCase):
         band = get_default_salary_band(
             JobLevel.L5, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
         )
-        # Target: 900 GSUs
+        # Target: 900 RSUs
 
-        # Exceeds rating (1.10 - 1.45x) -> [990, 1305] GSUs
+        # Exceeds rating (1.10 - 1.45x) -> [990, 1305] RSUs
         res_ok = evaluate_equity_guidelines(1100, band, PerformanceRating.EXCEEDS)
         self.assertTrue(res_ok.passed)
 
@@ -167,13 +167,13 @@ class TestCompensationTools(unittest.TestCase):
         band = get_default_salary_band(
             JobLevel.L5, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
         )
-        # Target equity: 900 GSUs, max new hire (1.5x) = 1350
+        # Target equity: 900 RSUs, max new hire (1.5x) = 1350
 
         # Normal offer
         findings_ok = evaluate_candidate_offer_compliance(
             proposed_base=Decimal("240000.00"),
             sign_on_bonus=Decimal("20000.00"),
-            proposed_equity_gsus=1000,
+            proposed_equity_rsus=1000,
             band=band,
         )
         self.assertTrue(all(f.passed for f in findings_ok))
@@ -182,7 +182,7 @@ class TestCompensationTools(unittest.TestCase):
         findings_high_sign_on = evaluate_candidate_offer_compliance(
             proposed_base=Decimal("240000.00"),
             sign_on_bonus=Decimal("60000.00"),
-            proposed_equity_gsus=1000,
+            proposed_equity_rsus=1000,
             band=band,
         )
         sign_on_check = [f for f in findings_high_sign_on if f.check_name == "SIGN_ON_BONUS_CAP"][0]
@@ -193,8 +193,8 @@ class TestCompensationTools(unittest.TestCase):
             proposed_base=Decimal("200000.00"),
             sign_on_bonus=Decimal("30000.00"),
             target_bonus_pct=Decimal("15.00"),
-            proposed_equity_gsus=1200,
-            estimated_gsu_price=Decimal("150.00"),
+            proposed_equity_rsus=1200,
+            estimated_rsu_price=Decimal("150.00"),
         )
         self.assertEqual(totals["target_bonus"], Decimal("30000.00"))
         self.assertEqual(totals["total_target_cash"], Decimal("230000.00"))

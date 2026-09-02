@@ -30,13 +30,17 @@ class InMemProposal:
     job_level: JobLevel
     current_base: Decimal
     proposed_base: Decimal
-    proposed_equity_gsus: int
+    proposed_equity_rsus: int
     performance_rating: PerformanceRating
     job_family: JobFamily = JobFamily.SOFTWARE_ENGINEERING
     location_tier: LocationTier = LocationTier.US_ZONE_1
     status: ReviewStatus = ReviewStatus.DRAFT
     manager_notes: str = ""
     audit_result: AgentAuditResult | None = None
+
+    @property
+    def proposed_equity_gsus(self) -> int:
+        return self.proposed_equity_rsus
 
 
 class CompensationWorkflowEngine:
@@ -87,7 +91,7 @@ class CompensationWorkflowEngine:
             proposed_bonus=bonus,
             individual_perf_factor=Decimal("1.00"),
             company_perf_factor=Decimal("1.00"),
-            proposed_equity_gsus=p.proposed_equity_gsus,
+            proposed_equity_rsus=p.proposed_equity_rsus,
             performance_rating=p.performance_rating,
         )
         p.audit_result = audit_res

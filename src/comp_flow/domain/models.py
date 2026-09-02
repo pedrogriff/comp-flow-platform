@@ -8,7 +8,7 @@ from enum import StrEnum
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class JobLevel(StrEnum):
@@ -191,8 +191,14 @@ class SalaryBandBase(BaseModel):
     min_base: Decimal = Field(gt=0)
     mid_base: Decimal = Field(gt=0)
     max_base: Decimal = Field(gt=0)
-    target_equity_gsus: int = Field(ge=0)
+    target_equity_rsus: int = Field(
+        ge=0, validation_alias=AliasChoices("target_equity_rsus", "target_equity_gsus")
+    )
     target_bonus_pct: Decimal = Field(default=Decimal("15.0"), ge=0, le=100)
+
+    @property
+    def target_equity_gsus(self) -> int:
+        return self.target_equity_rsus
 
 
 class SalaryBandCreate(SalaryBandBase):
@@ -219,8 +225,16 @@ class EmployeeBase(BaseModel):
     location_tier: LocationTier = LocationTier.US_ZONE_1
     department_id: UUID
     current_base: Decimal = Field(gt=0)
-    current_equity_gsus: int = Field(default=0, ge=0)
+    current_equity_rsus: int = Field(
+        default=0,
+        ge=0,
+        validation_alias=AliasChoices("current_equity_rsus", "current_equity_gsus"),
+    )
     last_performance_rating: PerformanceRating = PerformanceRating.CONSISTENTLY_MEETS
+
+    @property
+    def current_equity_gsus(self) -> int:
+        return self.current_equity_rsus
 
 
 class EmployeeCreate(EmployeeBase):
@@ -296,9 +310,17 @@ class EmployeeReviewProposalBase(BaseModel):
     proposed_base: Decimal = Field(gt=0)
     proposed_bonus_amount: Decimal = Field(default=Decimal("0.00"), ge=0)
     individual_perf_factor: Decimal = Field(default=Decimal("1.00"), ge=0, le=2.5)
-    proposed_equity_gsus: int = Field(default=0, ge=0)
+    proposed_equity_rsus: int = Field(
+        default=0,
+        ge=0,
+        validation_alias=AliasChoices("proposed_equity_rsus", "proposed_equity_gsus"),
+    )
     performance_rating: PerformanceRating
     justification_notes: str = ""
+
+    @property
+    def proposed_equity_gsus(self) -> int:
+        return self.proposed_equity_rsus
 
 
 class EmployeeReviewProposalCreate(EmployeeReviewProposalBase):
@@ -310,9 +332,16 @@ class EmployeeReviewProposalUpdate(BaseModel):
     proposed_base: Decimal | None = None
     proposed_bonus_amount: Decimal | None = None
     individual_perf_factor: Decimal | None = None
-    proposed_equity_gsus: int | None = None
+    proposed_equity_rsus: int | None = Field(
+        default=None,
+        validation_alias=AliasChoices("proposed_equity_rsus", "proposed_equity_gsus"),
+    )
     performance_rating: PerformanceRating | None = None
     justification_notes: str | None = None
+
+    @property
+    def proposed_equity_gsus(self) -> int | None:
+        return self.proposed_equity_rsus
 
 
 class EmployeeReviewProposalResponse(EmployeeReviewProposalBase):
@@ -342,9 +371,17 @@ class CandidateOfferBase(BaseModel):
     department_id: UUID
     proposed_base: Decimal = Field(gt=0)
     sign_on_bonus: Decimal = Field(default=Decimal("0.00"), ge=0)
-    proposed_equity_gsus: int = Field(default=0, ge=0)
+    proposed_equity_rsus: int = Field(
+        default=0,
+        ge=0,
+        validation_alias=AliasChoices("proposed_equity_rsus", "proposed_equity_gsus"),
+    )
     target_start_date: date
     notes: str = ""
+
+    @property
+    def proposed_equity_gsus(self) -> int:
+        return self.proposed_equity_rsus
 
 
 class CandidateOfferCreate(CandidateOfferBase):
@@ -356,9 +393,16 @@ class CandidateOfferUpdate(BaseModel):
     location_tier: LocationTier | None = None
     proposed_base: Decimal | None = None
     sign_on_bonus: Decimal | None = None
-    proposed_equity_gsus: int | None = None
+    proposed_equity_rsus: int | None = Field(
+        default=None,
+        validation_alias=AliasChoices("proposed_equity_rsus", "proposed_equity_gsus"),
+    )
     target_start_date: date | None = None
     notes: str | None = None
+
+    @property
+    def proposed_equity_gsus(self) -> int | None:
+        return self.proposed_equity_rsus
 
 
 class CandidateOfferResponse(CandidateOfferBase):

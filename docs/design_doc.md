@@ -98,7 +98,7 @@ erDiagram
         decimal min_base
         decimal mid_base
         decimal max_base
-        int target_equity_gsus
+        int target_equity_rsus
         decimal target_bonus_pct
     }
 
@@ -113,7 +113,7 @@ erDiagram
         string location_tier
         uuid department_id FK
         decimal current_base
-        int current_equity_gsus
+        int current_equity_rsus
         string last_performance_rating
     }
 
@@ -153,7 +153,7 @@ erDiagram
         decimal proposed_bonus_amount
         decimal individual_perf_factor
         decimal company_perf_factor
-        int proposed_equity_gsus
+        int proposed_equity_rsus
         string performance_rating
         string status
         jsonb audit_summary
@@ -171,7 +171,7 @@ erDiagram
         uuid department_id FK
         decimal proposed_base
         decimal sign_on_bonus
-        int proposed_equity_gsus
+        int proposed_equity_rsus
         decimal compa_ratio
         date target_start_date
         string status

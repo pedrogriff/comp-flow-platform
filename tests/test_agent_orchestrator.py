@@ -37,7 +37,7 @@ class TestAgentOrchestrator(unittest.TestCase):
             proposed_bonus=Decimal("37500.00"),  # Exact 15% target
             individual_perf_factor=Decimal("1.00"),
             company_perf_factor=Decimal("1.00"),
-            proposed_equity_gsus=950,  # Target: 900
+            proposed_equity_rsus=950,  # Target: 900
             performance_rating=PerformanceRating.CONSISTENTLY_MEETS,
         )
 
@@ -58,7 +58,7 @@ class TestAgentOrchestrator(unittest.TestCase):
             proposed_bonus=Decimal("37500.00"),
             individual_perf_factor=Decimal("1.00"),
             company_perf_factor=Decimal("1.00"),
-            proposed_equity_gsus=2500,  # Far above 900 target
+            proposed_equity_rsus=2500,  # Far above 900 target
             performance_rating=PerformanceRating.CONSISTENTLY_MEETS,
         )
 
@@ -78,7 +78,7 @@ class TestAgentOrchestrator(unittest.TestCase):
             proposed_bonus=Decimal("0.00"),
             individual_perf_factor=Decimal("0.00"),
             company_perf_factor=Decimal("1.00"),
-            proposed_equity_gsus=0,
+            proposed_equity_rsus=0,
             performance_rating=PerformanceRating.NEEDS_IMPROVEMENT,
         )
 
@@ -94,7 +94,7 @@ class TestAgentOrchestrator(unittest.TestCase):
             location_tier=LocationTier.US_ZONE_1,
             proposed_base=Decimal("245000.00"),  # Compa ~0.980
             sign_on_bonus=Decimal("25000.00"),  # < $50k
-            proposed_equity_gsus=1000,  # < 1350 max new hire
+            proposed_equity_rsus=1000,  # < 1350 max new hire
         )
 
         self.assertEqual(audit.decision, OfferStatus.OFFER_APPROVED.value)
@@ -109,7 +109,7 @@ class TestAgentOrchestrator(unittest.TestCase):
             location_tier=LocationTier.US_ZONE_1,
             proposed_base=Decimal("310000.00"),
             sign_on_bonus=Decimal("75000.00"),  # Exceeds $50k cap
-            proposed_equity_gsus=1400,
+            proposed_equity_rsus=1400,
         )
 
         self.assertEqual(audit.decision, OfferStatus.VP_EXCEPTION_REQUIRED.value)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from decimal import ROUND_HALF_UP, Decimal
+from typing import Any
 
 from comp_flow.domain.models import (
     AuditFinding,
@@ -98,7 +99,7 @@ def get_default_salary_band(
         min_base=adjusted_min,
         mid_base=adjusted_mid,
         max_base=adjusted_max,
-        target_equity_gsus=target_equity,
+        target_equity_rsus=target_equity,
         target_bonus_pct=target_bonus_pct,
     )
 
@@ -204,35 +205,38 @@ def evaluate_bonus_compliance(
 
 
 def evaluate_equity_guidelines(
-    proposed_gsus: int,
-    band: SalaryBandBase,
-    rating: PerformanceRating,
+    proposed_rsus: int = 0,
+    band: SalaryBandBase = None,  # type: ignore[assignment]
+    rating: PerformanceRating = PerformanceRating.CONSISTENTLY_MEETS,
+    **kwargs: Any,
 ) -> AuditFinding:
-    """Evaluates proposed GSU equity grant against target guidelines adjusted for performance."""
-    target = band.target_equity_gsus
+    """Evaluates proposed RSU equity grant against target guidelines adjusted for performance."""
+    if "proposed_gsus" in kwargs and not proposed_rsus:
+        proposed_rsus = int(kwargs["proposed_gsus"])
+    target = band.target_equity_rsus
     min_mult, max_mult = EQUITY_PERFORMANCE_MULTIPLIERS[rating]
     min_allowed = int(Decimal(target) * min_mult)
     max_allowed = int(Decimal(target) * max_mult)
 
-    ratio = Decimal(proposed_gsus) / Decimal(target) if target > 0 else Decimal("0.0")
+    ratio = Decimal(proposed_rsus) / Decimal(target) if target > 0 else Decimal("0.0")
 
-    if proposed_gsus < min_allowed:
+    if proposed_rsus < min_allowed:
         return AuditFinding(
             check_name="EQUITY_GUIDELINE_COMPLIANCE",
             passed=False,
             details=(
-                f"Proposed {proposed_gsus:,d} GSUs is below allowable range "
+                f"Proposed {proposed_rsus:,d} RSUs is below allowable range "
                 f"[{min_allowed:,d}, {max_allowed:,d}] for {rating.value} (Target: {target:,d})"
             ),
             severity="WARNING",
         )
 
-    if proposed_gsus > max_allowed:
+    if proposed_rsus > max_allowed:
         return AuditFinding(
             check_name="EQUITY_GUIDELINE_COMPLIANCE",
             passed=False,
             details=(
-                f"Proposed {proposed_gsus:,d} GSUs exceeds allowable maximum "
+                f"Proposed {proposed_rsus:,d} RSUs exceeds allowable maximum "
                 f"{max_allowed:,d} for {rating.value} (Target: {target:,d}, Ratio: {ratio:.2f}x)"
             ),
             severity="CRITICAL",
@@ -242,7 +246,7 @@ def evaluate_equity_guidelines(
         check_name="EQUITY_GUIDELINE_COMPLIANCE",
         passed=True,
         details=(
-            f"Proposed {proposed_gsus:,d} GSUs is within guidelines "
+            f"Proposed {proposed_rsus:,d} RSUs is within guidelines "
             f"[{min_allowed:,d}, {max_allowed:,d}] for {rating.value} ({ratio:.2f}x of target)"
         ),
         severity="INFO",
@@ -338,10 +342,14 @@ def evaluate_promotion_compliance(
 def evaluate_candidate_offer_compliance(
     proposed_base: Decimal,
     sign_on_bonus: Decimal,
-    proposed_equity_gsus: int,
-    band: SalaryBandBase,
+    proposed_equity_rsus: int = 0,
+    band: SalaryBandBase = None,  # type: ignore[assignment]
+    **kwargs: Any,
 ) -> list[AuditFinding]:
     """Runs compliance checks on candidate new hire offer package."""
+    if "proposed_equity_gsus" in kwargs and not proposed_equity_rsus:
+        proposed_equity_rsus = int(kwargs["proposed_equity_gsus"])
+
     findings: list[AuditFinding] = []
 
     # 1. Base Salary Band Check
@@ -369,15 +377,15 @@ def evaluate_candidate_offer_compliance(
         )
 
     # 3. New Hire Equity Grant Cap (1.5x of annual target)
-    max_new_hire_equity = int(Decimal(band.target_equity_gsus) * Decimal("1.50"))
-    if proposed_equity_gsus > max_new_hire_equity:
+    max_new_hire_equity = int(Decimal(band.target_equity_rsus) * Decimal("1.50"))
+    if proposed_equity_rsus > max_new_hire_equity:
         findings.append(
             AuditFinding(
                 check_name="NEW_HIRE_EQUITY_CAP",
                 passed=False,
                 details=(
-                    f"Proposed equity {proposed_equity_gsus:,d} GSUs exceeds new hire cap "
-                    f"{max_new_hire_equity:,d} (Target: {band.target_equity_gsus:,d})"
+                    f"Proposed equity {proposed_equity_rsus:,d} RSUs exceeds new hire cap "
+                    f"{max_new_hire_equity:,d} (Target: {band.target_equity_rsus:,d})"
                 ),
                 severity="CRITICAL",
             )
@@ -387,7 +395,7 @@ def evaluate_candidate_offer_compliance(
             AuditFinding(
                 check_name="NEW_HIRE_EQUITY_CAP",
                 passed=True,
-                details=f"Proposed equity {proposed_equity_gsus:,d} GSUs is within new hire guidelines",
+                details=f"Proposed equity {proposed_equity_rsus:,d} RSUs is within new hire guidelines",
                 severity="INFO",
             )
         )
@@ -399,10 +407,16 @@ def calculate_offer_total_comp(
     proposed_base: Decimal,
     sign_on_bonus: Decimal,
     target_bonus_pct: Decimal,
-    proposed_equity_gsus: int,
-    estimated_gsu_price: Decimal = Decimal("150.00"),
+    proposed_equity_rsus: int = 0,
+    estimated_rsu_price: Decimal = Decimal("150.00"),
+    **kwargs: Any,
 ) -> dict[str, Decimal]:
     """Calculates Total Target Cash and First Year Total Direct Comp for an offer."""
+    if "proposed_equity_gsus" in kwargs and not proposed_equity_rsus:
+        proposed_equity_rsus = int(kwargs["proposed_equity_gsus"])
+    if "estimated_gsu_price" in kwargs:
+        estimated_rsu_price = Decimal(str(kwargs["estimated_gsu_price"]))
+
     target_bonus = (proposed_base * target_bonus_pct / Decimal("100.0")).quantize(
         Decimal("0.01"), rounding=ROUND_HALF_UP
     )
@@ -410,7 +424,7 @@ def calculate_offer_total_comp(
 
     # Standard Year 1 Front-loaded equity tranche (33.33%)
     year_1_equity_val = (
-        Decimal(proposed_equity_gsus) * Decimal("0.33333333") * estimated_gsu_price
+        Decimal(proposed_equity_rsus) * Decimal("0.33333333") * estimated_rsu_price
     ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
     first_year_total_comp = proposed_base + sign_on_bonus + target_bonus + year_1_equity_val

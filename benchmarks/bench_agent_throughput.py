@@ -34,7 +34,7 @@ def generate_synthetic_reviews(n: int) -> list[InMemProposal]:
                 job_level=lvl,
                 current_base=curr_base,
                 proposed_base=proposed_base,
-                proposed_equity_gsus=equity,
+                proposed_equity_rsus=equity,
                 performance_rating=rating,
             )
         )

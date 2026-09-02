@@ -7,7 +7,7 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 from comp_flow.domain.models import JobFamily, JobLevel, LocationTier
 
@@ -67,10 +67,26 @@ class BenchmarkPercentiles(BaseModel):
     p90_base: Decimal = Field(..., description="90th percentile base salary")
 
     target_bonus_pct: Decimal = Field(default=Decimal("15.00"), description="Market target bonus %")
-    p50_equity_gsus: int = Field(default=0, description="Market median equity grant (GSUs)")
-    p75_equity_gsus: int = Field(default=0, description="75th percentile equity grant (GSUs)")
+    p50_equity_rsus: int = Field(
+        default=0,
+        validation_alias=AliasChoices("p50_equity_rsus", "p50_equity_gsus"),
+        description="Market median equity grant (RSUs)",
+    )
+    p75_equity_rsus: int = Field(
+        default=0,
+        validation_alias=AliasChoices("p75_equity_rsus", "p75_equity_gsus"),
+        description="75th percentile equity grant (RSUs)",
+    )
 
     sample_size: int = Field(default=0, description="Number of observations after outlier trimming")
+
+    @property
+    def p50_equity_gsus(self) -> int:
+        return self.p50_equity_rsus
+
+    @property
+    def p75_equity_gsus(self) -> int:
+        return self.p75_equity_rsus
 
 
 class MarketBenchmark(BaseModel):
@@ -98,8 +114,14 @@ class MarketBenchmark(BaseModel):
 
     # Total Direct Comp Percentiles
     target_bonus_pct: Decimal
-    p50_equity_gsus: int = 0
-    p75_equity_gsus: int = 0
+    p50_equity_rsus: int = Field(
+        default=0,
+        validation_alias=AliasChoices("p50_equity_rsus", "p50_equity_gsus"),
+    )
+    p75_equity_rsus: int = Field(
+        default=0,
+        validation_alias=AliasChoices("p75_equity_rsus", "p75_equity_gsus"),
+    )
 
     # Metadata & Data Provenance
     sample_size: int
@@ -109,6 +131,14 @@ class MarketBenchmark(BaseModel):
     annual_aging_rate: Decimal = Decimal("0.040")  # 4.0% annual wage movement index
     is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+    @property
+    def p50_equity_gsus(self) -> int:
+        return self.p50_equity_rsus
+
+    @property
+    def p75_equity_gsus(self) -> int:
+        return self.p75_equity_rsus
 
 
 class BenchmarkComparisonResult(BaseModel):

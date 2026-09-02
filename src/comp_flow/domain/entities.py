@@ -22,7 +22,7 @@ from sqlalchemy import (
     Enum as SQLEnum,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, synonym
 from sqlalchemy.types import JSON
 
 from comp_flow.domain.benchmarks import BenchmarkSourceType, RadfordLevel
@@ -128,7 +128,8 @@ class SalaryBand(Base):
     min_base: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     mid_base: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     max_base: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
-    target_equity_gsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    target_equity_rsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    target_equity_gsus = synonym("target_equity_rsus")
     target_bonus_pct: Mapped[Decimal] = mapped_column(
         Numeric(5, 2), nullable=False, default=Decimal("15.00")
     )
@@ -169,7 +170,8 @@ class Employee(Base):
         UUID(as_uuid=True), ForeignKey("departments.id", ondelete="RESTRICT"), nullable=False
     )
     current_base: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
-    current_equity_gsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    current_equity_rsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    current_equity_gsus = synonym("current_equity_rsus")
     last_performance_rating: Mapped[PerformanceRating] = mapped_column(
         SQLEnum(PerformanceRating, name="perf_rating_enum", native_enum=False),
         nullable=False,
@@ -308,7 +310,8 @@ class EmployeeReview(Base):
     company_perf_factor: Mapped[Decimal] = mapped_column(
         Numeric(4, 2), nullable=False, default=Decimal("1.00")
     )
-    proposed_equity_gsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    proposed_equity_rsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    proposed_equity_gsus = synonym("proposed_equity_rsus")
     performance_rating: Mapped[PerformanceRating] = mapped_column(
         SQLEnum(PerformanceRating, name="perf_rating_enum", native_enum=False), nullable=False
     )
@@ -364,7 +367,8 @@ class CandidateOffer(Base):
     sign_on_bonus: Mapped[Decimal] = mapped_column(
         Numeric(12, 2), nullable=False, default=Decimal("0.00")
     )
-    proposed_equity_gsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    proposed_equity_rsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    proposed_equity_gsus = synonym("proposed_equity_rsus")
     compa_ratio: Mapped[Decimal] = mapped_column(
         Numeric(5, 3), nullable=False, default=Decimal("1.000")
     )
@@ -454,8 +458,10 @@ class MarketBenchmark(Base):
     target_bonus_pct: Mapped[Decimal] = mapped_column(
         Numeric(5, 2), nullable=False, default=Decimal("15.00")
     )
-    p50_equity_gsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    p75_equity_gsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    p50_equity_rsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    p75_equity_rsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    p50_equity_gsus = synonym("p50_equity_rsus")
+    p75_equity_gsus = synonym("p75_equity_rsus")
 
     sample_size: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     source_type: Mapped[BenchmarkSourceType] = mapped_column(

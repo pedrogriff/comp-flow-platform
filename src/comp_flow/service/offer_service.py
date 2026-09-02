@@ -44,7 +44,7 @@ class OfferService:
             proposed_base=offer_in.proposed_base,
             sign_on_bonus=offer_in.sign_on_bonus,
             target_bonus_pct=band.target_bonus_pct,
-            proposed_equity_gsus=offer_in.proposed_equity_gsus,
+            proposed_equity_rsus=offer_in.proposed_equity_rsus,
         )
 
         random_suffix = random.randint(1000, 9999)
@@ -63,7 +63,7 @@ class OfferService:
             hiring_manager_id=offer_in.hiring_manager_id,
             proposed_base=offer_in.proposed_base,
             sign_on_bonus=offer_in.sign_on_bonus,
-            proposed_equity_gsus=offer_in.proposed_equity_gsus,
+            proposed_equity_rsus=offer_in.proposed_equity_rsus,
             compa_ratio=compa,
             total_target_cash=totals["total_target_cash"],
             first_year_total_comp=totals["first_year_total_comp"],
@@ -132,7 +132,7 @@ class OfferService:
             location_tier=offer.location_tier,
             proposed_base=offer.proposed_base,
             sign_on_bonus=offer.sign_on_bonus,
-            proposed_equity_gsus=offer.proposed_equity_gsus,
+            proposed_equity_rsus=offer.proposed_equity_rsus,
             band=band,
         )
 

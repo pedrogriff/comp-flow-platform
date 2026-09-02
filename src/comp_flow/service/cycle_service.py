@@ -77,7 +77,7 @@ class CycleService:
                 * Decimal("0.15")
                 * (cycle_in.bonus_pool_funding_pct / Decimal("100.0"))
             ).quantize(Decimal("0.01"))
-            allocated_equity = len(active_emps) * 1000  # Baseline 1000 GSUs per head pool
+            allocated_equity = len(active_emps) * 1000  # Baseline 1000 RSUs per head pool
 
             budget = CycleBudget(
                 id=uuid.uuid4(),
@@ -185,7 +185,7 @@ class CycleService:
             proposed_bonus_amount=proposal_in.proposed_bonus_amount,
             individual_perf_factor=proposal_in.individual_perf_factor,
             company_perf_factor=cycle.company_performance_factor,
-            proposed_equity_gsus=proposal_in.proposed_equity_gsus,
+            proposed_equity_rsus=proposal_in.proposed_equity_rsus,
             performance_rating=proposal_in.performance_rating,
             status=ReviewStatus.DRAFT,
             justification_notes=proposal_in.justification_notes,
@@ -246,7 +246,7 @@ class CycleService:
             proposed_bonus=proposal.proposed_bonus_amount,
             individual_perf_factor=proposal.individual_perf_factor,
             company_perf_factor=proposal.company_perf_factor,
-            proposed_equity_gsus=proposal.proposed_equity_gsus,
+            proposed_equity_rsus=proposal.proposed_equity_rsus,
             performance_rating=proposal.performance_rating,
             band=band,
         )
@@ -405,7 +405,7 @@ class CycleService:
                 emp = r.employee
                 emp.current_base = r.proposed_base
                 emp.job_level = r.proposed_job_level
-                emp.current_equity_gsus += r.proposed_equity_gsus
+                emp.current_equity_rsus += r.proposed_equity_rsus
                 emp.last_performance_rating = r.performance_rating
 
         cycle.status = CycleStatus.FINALIZED
@@ -466,7 +466,7 @@ class CycleService:
             Decimal("0.00"),
         )
         depleted_bonus = sum((p.proposed_bonus_amount for p in proposals), Decimal("0.00"))
-        depleted_equity = sum((p.proposed_equity_gsus for p in proposals), 0)
+        depleted_equity = sum((p.proposed_equity_rsus for p in proposals), 0)
 
         allocated_merit = budget.allocated_merit_budget if budget else Decimal("0.00")
         allocated_bonus = budget.allocated_bonus_pool if budget else Decimal("0.00")

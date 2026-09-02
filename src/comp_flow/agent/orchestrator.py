@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 from decimal import Decimal
+from typing import Any
 
 from comp_flow.domain.models import (
     AgentAuditResult,
@@ -44,18 +45,22 @@ class EmployeeCalibrationAgent:
         proposed_bonus: Decimal,
         individual_perf_factor: Decimal,
         company_perf_factor: Decimal,
-        proposed_equity_gsus: int,
-        performance_rating: PerformanceRating,
+        proposed_equity_rsus: int = 0,
+        performance_rating: PerformanceRating = PerformanceRating.CONSISTENTLY_MEETS,
         band: SalaryBandBase | None = None,
+        **kwargs: Any,
     ) -> AgentAuditResult:
         """Audits proposed merit, bonus, equity, and promotion against internal benchmarks."""
+        if "proposed_equity_gsus" in kwargs and not proposed_equity_rsus:
+            proposed_equity_rsus = int(kwargs["proposed_equity_gsus"])
+
         t0 = time.perf_counter()
 
         target_band = band or get_default_salary_band(proposed_level, job_family, location_tier)
         compa_ratio = calculate_compa_ratio(proposed_base, target_band.mid_base)
         equity_ratio = (
-            Decimal(proposed_equity_gsus) / Decimal(target_band.target_equity_gsus)
-            if target_band.target_equity_gsus > 0
+            Decimal(proposed_equity_rsus) / Decimal(target_band.target_equity_rsus)
+            if target_band.target_equity_rsus > 0
             else Decimal("0.00")
         )
 
@@ -78,7 +83,7 @@ class EmployeeCalibrationAgent:
         # 3. Equity Guideline Compliance
         findings.append(
             evaluate_equity_guidelines(
-                proposed_gsus=proposed_equity_gsus,
+                proposed_rsus=proposed_equity_rsus,
                 band=target_band,
                 rating=performance_rating,
             )
@@ -157,24 +162,28 @@ class OfferApprovalAgent:
         location_tier: LocationTier,
         proposed_base: Decimal,
         sign_on_bonus: Decimal,
-        proposed_equity_gsus: int,
+        proposed_equity_rsus: int = 0,
         band: SalaryBandBase | None = None,
+        **kwargs: Any,
     ) -> AgentAuditResult:
         """Audits candidate offer package against location-tiered bands and sign-on/equity caps."""
+        if "proposed_equity_gsus" in kwargs and not proposed_equity_rsus:
+            proposed_equity_rsus = int(kwargs["proposed_equity_gsus"])
+
         t0 = time.perf_counter()
 
         target_band = band or get_default_salary_band(job_level, job_family, location_tier)
         compa_ratio = calculate_compa_ratio(proposed_base, target_band.mid_base)
         equity_ratio = (
-            Decimal(proposed_equity_gsus) / Decimal(target_band.target_equity_gsus)
-            if target_band.target_equity_gsus > 0
+            Decimal(proposed_equity_rsus) / Decimal(target_band.target_equity_rsus)
+            if target_band.target_equity_rsus > 0
             else Decimal("0.00")
         )
 
         findings = evaluate_candidate_offer_compliance(
             proposed_base=proposed_base,
             sign_on_bonus=sign_on_bonus,
-            proposed_equity_gsus=proposed_equity_gsus,
+            proposed_equity_rsus=proposed_equity_rsus,
             band=target_band,
         )
 
@@ -202,7 +211,7 @@ class OfferApprovalAgent:
                 proposed_base=proposed_base,
                 sign_on_bonus=sign_on_bonus,
                 target_bonus_pct=target_band.target_bonus_pct,
-                proposed_equity_gsus=proposed_equity_gsus,
+                proposed_equity_rsus=proposed_equity_rsus,
             )
             rationale = (
                 f"OFFER APPROVED: Package complies with {job_level.value} {location_tier.value} guidelines "

@@ -107,7 +107,7 @@ async def seeded_test_db(test_db_session: AsyncSession) -> dict[str, object]:
         min_base=b_l5.min_base,
         mid_base=b_l5.mid_base,
         max_base=b_l5.max_base,
-        target_equity_gsus=b_l5.target_equity_gsus,
+        target_equity_rsus=b_l5.target_equity_rsus,
         target_bonus_pct=b_l5.target_bonus_pct,
     )
     db.add(band)
@@ -124,7 +124,7 @@ async def seeded_test_db(test_db_session: AsyncSession) -> dict[str, object]:
         location_tier=LocationTier.US_ZONE_1,
         department_id=dept.id,
         current_base=Decimal("230000.00"),
-        current_equity_gsus=2700,
+        current_equity_rsus=2700,
         last_performance_rating=PerformanceRating.CONSISTENTLY_MEETS,
         is_active=True,
     )

@@ -83,7 +83,7 @@ async def test_salary_bands_endpoints(
             "min_base": "260000.00",
             "mid_base": "310000.00",
             "max_base": "360000.00",
-            "target_equity_gsus": 1400,
+            "target_equity_rsus": 1400,
             "target_bonus_pct": "20.00",
         },
     )
@@ -142,7 +142,7 @@ async def test_compensation_cycle_full_lifecycle(
             "proposed_base": "245000.00",  # +6.5% raise
             "proposed_bonus_amount": "36750.00",  # 15% target
             "individual_perf_factor": "1.00",
-            "proposed_equity_gsus": 900,
+            "proposed_equity_rsus": 900,
             "performance_rating": "CONSISTENTLY_MEETS",
             "justification_notes": "Great contributions to platform reliability.",
         },
@@ -201,7 +201,7 @@ async def test_candidate_offer_full_lifecycle(
             "department_id": str(dept.id),
             "proposed_base": "240000.00",
             "sign_on_bonus": "60000.00",  # > $50,000 threshold
-            "proposed_equity_gsus": 1000,
+            "proposed_equity_rsus": 1000,
             "target_start_date": str(date.today() + timedelta(days=30)),
             "notes": "Top tier candidate with specialized kernel expertise.",
         },
@@ -295,7 +295,7 @@ async def test_batch_audit_and_rbac_forbidden(
             "proposed_base": "240000.00",
             "proposed_bonus_amount": "36000.00",
             "individual_perf_factor": "1.00",
-            "proposed_equity_gsus": 900,
+            "proposed_equity_rsus": 900,
             "performance_rating": "CONSISTENTLY_MEETS",
             "justification_notes": "Test batch",
         },

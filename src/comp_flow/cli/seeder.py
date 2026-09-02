@@ -145,7 +145,7 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
                             min_base=b_schema.min_base,
                             mid_base=b_schema.mid_base,
                             max_base=b_schema.max_base,
-                            target_equity_gsus=b_schema.target_equity_gsus,
+                            target_equity_rsus=b_schema.target_equity_rsus,
                             target_bonus_pct=b_schema.target_bonus_pct,
                         )
                         db.add(band)
@@ -247,7 +247,7 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
                     location_tier=geo,
                     department_id=dept.id,
                     current_base=base_sal,
-                    current_equity_gsus=b_emp.target_equity_gsus * 3,
+                    current_equity_rsus=b_emp.target_equity_rsus * 3,
                     last_performance_rating=rating,
                     is_active=True,
                 )
@@ -319,7 +319,7 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
 
                 # Make 1 proposal trigger a VP exception intentionally (huge equity)
                 equity_grant = (
-                    b_rev.target_equity_gsus if idx != 2 else int(b_rev.target_equity_gsus * 2.8)
+                    b_rev.target_equity_rsus if idx != 2 else int(b_rev.target_equity_rsus * 2.8)
                 )
 
                 rev = EmployeeReview(
@@ -336,7 +336,7 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
                     proposed_bonus_amount=bonus_amt,
                     individual_perf_factor=Decimal("1.10"),
                     company_perf_factor=cycle.company_performance_factor,
-                    proposed_equity_gsus=equity_grant,
+                    proposed_equity_rsus=equity_grant,
                     performance_rating=emp.last_performance_rating,
                     status=ReviewStatus.DRAFT,
                     justification_notes="Consistent high impact contributor across infrastructure refactors.",
@@ -386,12 +386,12 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
             ),
         ]
 
-        for idx, (c_name, c_email, lvl, geo, base, sign_on, eq_gsus) in enumerate(sample_offers):
+        for idx, (c_name, c_email, lvl, geo, base, sign_on, eq_rsus) in enumerate(sample_offers):
             offer_stmt = select(CandidateOffer).where(CandidateOffer.candidate_email == c_email)
             if not (await db.execute(offer_stmt)).scalar_one_or_none():
                 b_offer = get_default_salary_band(lvl, JobFamily.SOFTWARE_ENGINEERING, geo)
                 totals = calculate_offer_total_comp(
-                    base, sign_on, b_offer.target_bonus_pct, eq_gsus
+                    base, sign_on, b_offer.target_bonus_pct, eq_rsus
                 )
                 offer = CandidateOffer(
                     id=uuid.uuid4(),
@@ -406,7 +406,7 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
                     hiring_manager_id=manager_user.id,
                     proposed_base=base,
                     sign_on_bonus=sign_on,
-                    proposed_equity_gsus=eq_gsus,
+                    proposed_equity_rsus=eq_rsus,
                     compa_ratio=calculate_compa_ratio(base, b_offer.mid_base),
                     total_target_cash=totals["total_target_cash"],
                     first_year_total_comp=totals["first_year_total_comp"],

@@ -38,6 +38,7 @@ class BandService:
             job_level.value, job_family.value, location_tier.value
         )
         if cached:
+            eq = int(cached.get("target_equity_rsus") or cached.get("target_equity_gsus") or 0)
             return SalaryBandBase(
                 job_level=JobLevel(cached["job_level"]),
                 job_family=JobFamily(cached["job_family"]),
@@ -45,7 +46,7 @@ class BandService:
                 min_base=Decimal(str(cached["min_base"])),
                 mid_base=Decimal(str(cached["mid_base"])),
                 max_base=Decimal(str(cached["max_base"])),
-                target_equity_gsus=int(cached["target_equity_gsus"]),
+                target_equity_rsus=eq,
                 target_bonus_pct=Decimal(str(cached["target_bonus_pct"])),
             )
 
@@ -66,7 +67,7 @@ class BandService:
                 min_base=band_record.min_base,
                 mid_base=band_record.mid_base,
                 max_base=band_record.max_base,
-                target_equity_gsus=band_record.target_equity_gsus,
+                target_equity_rsus=band_record.target_equity_rsus,
                 target_bonus_pct=band_record.target_bonus_pct,
             )
         else:
@@ -80,7 +81,7 @@ class BandService:
                 min_base=band_schema.min_base,
                 mid_base=band_schema.mid_base,
                 max_base=band_schema.max_base,
-                target_equity_gsus=band_schema.target_equity_gsus,
+                target_equity_rsus=band_schema.target_equity_rsus,
                 target_bonus_pct=band_schema.target_bonus_pct,
             )
             db.add(new_band)
@@ -94,7 +95,8 @@ class BandService:
             "min_base": str(band_schema.min_base),
             "mid_base": str(band_schema.mid_base),
             "max_base": str(band_schema.max_base),
-            "target_equity_gsus": band_schema.target_equity_gsus,
+            "target_equity_rsus": band_schema.target_equity_rsus,
+            "target_equity_gsus": band_schema.target_equity_rsus,
             "target_bonus_pct": str(band_schema.target_bonus_pct),
         }
         await redis_client.cache_band(
@@ -125,7 +127,7 @@ class BandService:
             existing.min_base = band_in.min_base
             existing.mid_base = band_in.mid_base
             existing.max_base = band_in.max_base
-            existing.target_equity_gsus = band_in.target_equity_gsus
+            existing.target_equity_rsus = band_in.target_equity_rsus
             existing.target_bonus_pct = band_in.target_bonus_pct
             record = existing
         else:
@@ -137,7 +139,7 @@ class BandService:
                 min_base=band_in.min_base,
                 mid_base=band_in.mid_base,
                 max_base=band_in.max_base,
-                target_equity_gsus=band_in.target_equity_gsus,
+                target_equity_rsus=band_in.target_equity_rsus,
                 target_bonus_pct=band_in.target_bonus_pct,
             )
             db.add(record)
@@ -152,7 +154,8 @@ class BandService:
             "min_base": str(band_in.min_base),
             "mid_base": str(band_in.mid_base),
             "max_base": str(band_in.max_base),
-            "target_equity_gsus": band_in.target_equity_gsus,
+            "target_equity_rsus": band_in.target_equity_rsus,
+            "target_equity_gsus": band_in.target_equity_rsus,
             "target_bonus_pct": str(band_in.target_bonus_pct),
         }
         await redis_client.cache_band(

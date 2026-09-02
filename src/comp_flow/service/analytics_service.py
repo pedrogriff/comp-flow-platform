@@ -40,6 +40,7 @@ class AnalyticsService:
                 "merit_by_rating": {},
                 "total_merit_spend": "0.00",
                 "total_bonus_spend": "0.00",
+                "total_equity_rsus": 0,
                 "total_equity_gsus": 0,
             }
 
@@ -76,7 +77,7 @@ class AnalyticsService:
 
         total_merit_spend = Decimal("0.00")
         total_bonus_spend = Decimal("0.00")
-        total_equity_gsus = 0
+        total_equity_rsus = 0
 
         for p in proposals:
             r_val = p.performance_rating.value
@@ -87,7 +88,7 @@ class AnalyticsService:
                 increase = max(Decimal("0.00"), p.proposed_base - p.current_base)
                 total_merit_spend += increase
                 total_bonus_spend += p.proposed_bonus_amount
-                total_equity_gsus += p.proposed_equity_gsus
+                total_equity_rsus += p.proposed_equity_rsus
 
         merit_by_rating = {
             r: str((rating_merit_sums[r] / Decimal(rating_counts[r])).quantize(Decimal("0.01")))
@@ -103,5 +104,6 @@ class AnalyticsService:
             "merit_by_rating": merit_by_rating,
             "total_merit_spend": str(total_merit_spend),
             "total_bonus_spend": str(total_bonus_spend),
-            "total_equity_gsus": total_equity_gsus,
+            "total_equity_rsus": total_equity_rsus,
+            "total_equity_gsus": total_equity_rsus,
         }

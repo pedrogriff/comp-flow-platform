@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "comp-flow-platform"
 version = "1.0.0"
-description = "Agentic Compensation Calibration & Workflow Platform in Google-Caliber Modern Python"
+description = "Agentic Compensation Calibration & Workflow Platform in Enterprise-Grade Modern Python"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [

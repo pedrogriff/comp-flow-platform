@@ -104,8 +104,8 @@ class BenchmarkETLPipeline:
                 p75_base=aged_percentiles.p75_base,
                 p90_base=aged_percentiles.p90_base,
                 target_bonus_pct=target_bonus,
-                p50_equity_gsus=p50_eq,
-                p75_equity_gsus=int(p50_eq * 1.5),
+                p50_equity_rsus=p50_eq,
+                p75_equity_rsus=int(p50_eq * 1.5),
                 sample_size=aged_percentiles.sample_size,
                 source_type=source_type,
                 effective_date=eff_date,
@@ -144,8 +144,8 @@ class BenchmarkETLPipeline:
                 existing.p75_base = b.p75_base
                 existing.p90_base = b.p90_base
                 existing.target_bonus_pct = b.target_bonus_pct
-                existing.p50_equity_gsus = b.p50_equity_gsus
-                existing.p75_equity_gsus = b.p75_equity_gsus
+                existing.p50_equity_rsus = b.p50_equity_rsus
+                existing.p75_equity_rsus = b.p75_equity_rsus
                 existing.sample_size = b.sample_size
                 existing.aged_to_date = b.aged_to_date
                 existing.annual_aging_rate = b.annual_aging_rate
@@ -166,8 +166,8 @@ class BenchmarkETLPipeline:
                     p75_base=b.p75_base,
                     p90_base=b.p90_base,
                     target_bonus_pct=b.target_bonus_pct,
-                    p50_equity_gsus=b.p50_equity_gsus,
-                    p75_equity_gsus=b.p75_equity_gsus,
+                    p50_equity_rsus=b.p50_equity_rsus,
+                    p75_equity_rsus=b.p75_equity_rsus,
                     sample_size=b.sample_size,
                     source_type=b.source_type,
                     effective_date=b.effective_date,
