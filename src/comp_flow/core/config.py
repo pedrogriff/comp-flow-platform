@@ -47,8 +47,9 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://localhost:8000",
+        "http://127.0.0.1:8000",
         "https://playgriff.me",
-        "https://*.playgriff.me",
+        "https://www.playgriff.me",
         "https://compflow.10.0.0.170.nip.io",
         "https://compflow.homelab.local",
     ]
