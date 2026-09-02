@@ -9,7 +9,7 @@ from typing import Any
 
 import bcrypt
 import jwt
-from fastapi import Depends, HTTPException, Security, status
+from fastapi import Depends, Header, HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -58,10 +58,10 @@ def decode_access_token(token: str) -> TokenPayload:
     """Decodes and validates a JWT token."""
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        sub: str = payload.get("sub", "")
-        role_str: str = payload.get("role", "")
-        exp: int = payload.get("exp", 0)
-        if not sub or not role_str:
+        sub = payload.get("sub")
+        role_str = payload.get("role")
+        exp = payload.get("exp")
+        if not sub or not role_str or not exp:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token claims",
@@ -78,21 +78,14 @@ def decode_access_token(token: str) -> TokenPayload:
 
 async def get_current_user(
     auth_header: HTTPAuthorizationCredentials | None = Security(bearer_scheme),
+    x_api_key: str | None = Header(None, alias="X-API-Key"),
     db: AsyncSession = Depends(get_db),
 ) -> User:
     """FastAPI dependency to extract and verify the current authenticated user."""
-    if not auth_header or not auth_header.credentials:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authorization header missing",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    token_str = auth_header.credentials
-
-    # Support master API key fallback for service calls
-    if token_str == settings.MASTER_API_KEY:
-        # Return a synthetic system admin user
+    # Support master API key fallback via X-API-Key or Bearer token
+    if (x_api_key and x_api_key == settings.MASTER_API_KEY) or (
+        auth_header and auth_header.credentials == settings.MASTER_API_KEY
+    ):
         return User(
             id=uuid.UUID("00000000-0000-0000-0000-000000000001"),
             email="system-admin@compflow.internal",
@@ -102,6 +95,14 @@ async def get_current_user(
             is_active=True,
         )
 
+    if not auth_header or not auth_header.credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header missing",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token_str = auth_header.credentials
     payload = decode_access_token(token_str)
     query = select(User).where(User.email == payload.sub, User.is_active.is_(True))
     result = await db.execute(query)
@@ -115,6 +116,31 @@ async def get_current_user(
         )
 
     return user
+
+
+async def get_optional_user(
+    auth_header: HTTPAuthorizationCredentials | None = Security(bearer_scheme),
+    x_api_key: str | None = Header(None, alias="X-API-Key"),
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    """Extracts authenticated user if credentials exist, otherwise allows unauthenticated guest access."""
+    if (x_api_key and x_api_key == settings.MASTER_API_KEY) or (
+        auth_header and auth_header.credentials == settings.MASTER_API_KEY
+    ):
+        return User(
+            id=uuid.UUID("00000000-0000-0000-0000-000000000001"),
+            email="system-admin@compflow.internal",
+            full_name="CompFlow Master Service",
+            hashed_password="",
+            role=UserRole.HR_ADMIN,
+            is_active=True,
+        )
+    if not auth_header or not auth_header.credentials:
+        return None
+    try:
+        return await get_current_user(auth_header=auth_header, x_api_key=x_api_key, db=db)
+    except HTTPException:
+        return None
 
 
 def require_roles(*allowed_roles: UserRole) -> Callable[..., Any]:

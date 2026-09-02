@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from comp_flow.core.database import get_db
 from comp_flow.core.redis import RedisManager, get_redis
-from comp_flow.core.security import get_current_user, require_roles
+from comp_flow.core.security import get_current_user, get_optional_user, require_roles
 from comp_flow.domain.benchmarks import (
     BenchmarkComparisonResult,
     BenchmarkSourceType,
@@ -62,7 +62,7 @@ async def get_market_benchmark(
     source_type: BenchmarkSourceType | None = Query(None, description="Optional data source"),
     db: AsyncSession = Depends(get_db),
     redis: RedisManager | None = Depends(get_redis),
-    _user: User = Depends(get_current_user),
+    _user: User | None = Depends(get_optional_user),
 ) -> MarketBenchmark:
     """Fetches a specific market benchmark by level and location."""
     service = BenchmarkService(db, redis)
@@ -85,7 +85,7 @@ async def compare_compensation_proposal(
     request: BenchmarkCompareRequest,
     db: AsyncSession = Depends(get_db),
     redis: RedisManager | None = Depends(get_redis),
-    _user: User = Depends(get_current_user),
+    _user: User | None = Depends(get_optional_user),
 ) -> BenchmarkComparisonResult:
     """Evaluates proposed compensation against market percentiles, compa-ratio, and acceptance probability."""
     service = BenchmarkService(db, redis)

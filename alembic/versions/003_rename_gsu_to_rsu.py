@@ -20,7 +20,7 @@ def upgrade() -> None:
     op.alter_column("salary_bands", "target_equity_gsus", new_column_name="target_equity_rsus")
     op.alter_column("employees", "current_equity_gsus", new_column_name="current_equity_rsus")
     op.alter_column(
-        "review_proposals", "proposed_equity_gsus", new_column_name="proposed_equity_rsus"
+        "employee_reviews", "proposed_equity_gsus", new_column_name="proposed_equity_rsus"
     )
     op.alter_column(
         "candidate_offers", "proposed_equity_gsus", new_column_name="proposed_equity_rsus"
@@ -36,7 +36,7 @@ def downgrade() -> None:
         "candidate_offers", "proposed_equity_rsus", new_column_name="proposed_equity_gsus"
     )
     op.alter_column(
-        "review_proposals", "proposed_equity_rsus", new_column_name="proposed_equity_gsus"
+        "employee_reviews", "proposed_equity_rsus", new_column_name="proposed_equity_gsus"
     )
     op.alter_column("employees", "current_equity_rsus", new_column_name="current_equity_gsus")
     op.alter_column("salary_bands", "target_equity_rsus", new_column_name="target_equity_gsus")
