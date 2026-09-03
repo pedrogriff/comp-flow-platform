@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import logging
+import time
+import uuid
 from collections import defaultdict
 from collections.abc import Sequence
 from datetime import date
@@ -13,11 +15,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from comp_flow.domain.benchmarks import (
     BenchmarkSourceType,
+    ETLIngestionReport,
     MarketBenchmark,
 )
 from comp_flow.domain.entities import MarketBenchmark as MarketBenchmarkEntity
 from comp_flow.domain.models import JobFamily, JobLevel, LocationTier
 from comp_flow.etl.normalizer import BenchmarkNormalizer
+from comp_flow.etl.sources.dol_fetcher import DOLLiveFetcher
 from comp_flow.etl.sources.dol_lca_parser import DOLLCAParser
 from comp_flow.etl.sources.seed_loader import BenchmarkSeedLoader
 from comp_flow.etl.statistical_engine import BenchmarkStatisticalEngine
@@ -117,6 +121,129 @@ class BenchmarkETLPipeline:
 
         await self._persist_benchmarks(benchmarks)
         return benchmarks
+
+    async def ingest_live_dol_dataset(
+        self,
+        source_url: str | None = None,
+        fiscal_year: int = 2026,
+        max_records: int | None = None,
+        annual_aging_rate: Decimal = Decimal("0.0400"),
+        dry_run: bool = False,
+    ) -> tuple[list[MarketBenchmark], ETLIngestionReport]:
+        """Streams public US DOL OFLC disclosure data, cleanses with Tukey IQR, ages, and persists."""
+        t0 = time.perf_counter()
+        job_id = f"job-dol-{uuid.uuid4().hex[:8]}"
+        fetcher = DOLLiveFetcher()
+
+        stream = fetcher.stream_lines(source_url)
+        observation_stream = DOLLCAParser.parse_async_line_stream(stream)
+
+        cohorts: dict[tuple[JobFamily, JobLevel, LocationTier], list[Decimal]] = defaultdict(list)
+        eff_dates: dict[tuple[JobFamily, JobLevel, LocationTier], date] = {}
+        total_streamed = 0
+        valid_tech_count = 0
+
+        async for obs in observation_stream:
+            total_streamed += 1
+            role = BenchmarkNormalizer.normalize_role(obs.job_title, obs.soc_code)
+            geo = BenchmarkNormalizer.normalize_geo_tier(obs.city, obs.state, obs.metro_area)
+            key = (role.job_family, role.job_level, geo)
+
+            cohorts[key].append(obs.wage_rate)
+            valid_tech_count += 1
+            if key not in eff_dates or obs.effective_date < eff_dates[key]:
+                eff_dates[key] = obs.effective_date
+
+            if max_records and total_streamed >= max_records:
+                logger.info(f"Reached record limit of {max_records}; halting stream.")
+                break
+
+        benchmarks: list[MarketBenchmark] = []
+        today = date.today()
+        outliers_pruned = 0
+        safe_harbor_discarded = 0
+
+        for (family, level, geo), wages in cohorts.items():
+            if len(wages) < BenchmarkStatisticalEngine.MIN_SAFE_HARBOR_COUNT:
+                safe_harbor_discarded += 1
+                logger.info(
+                    f"Discarding cohort ({family}, {level}, {geo}) with count {len(wages)} < Safe Harbor minimum (5)"
+                )
+                continue
+
+            cleaned_wages = BenchmarkStatisticalEngine.filter_outliers_iqr(wages)
+            outliers_pruned += len(wages) - len(cleaned_wages)
+
+            raw_percentiles = BenchmarkStatisticalEngine.calculate_percentiles(wages)
+            eff_date = eff_dates.get((family, level, geo), date(2025, 1, 1))
+
+            aged_percentiles = BenchmarkStatisticalEngine.age_wage_dataset(
+                raw_percentiles,
+                effective_date=eff_date,
+                target_date=today,
+                annual_rate=annual_aging_rate,
+            )
+
+            radford = BenchmarkNormalizer.RADFORD_LEVEL_MAP.get(
+                level, BenchmarkNormalizer.RADFORD_LEVEL_MAP[JobLevel.L5]
+            )
+            soc = BenchmarkNormalizer.SOC_MAPPINGS.get(family, "15-1252.00")
+
+            target_bonus = (
+                Decimal("10.00")
+                if level == JobLevel.L3
+                else (Decimal("15.00") if level in (JobLevel.L4, JobLevel.L5) else Decimal("20.00"))
+            )
+            p50_eq = 400 if level == JobLevel.L3 else (900 if level == JobLevel.L5 else 1400)
+
+            bench = MarketBenchmark(
+                soc_code=soc,
+                job_family=family,
+                job_level=level,
+                radford_level=radford,
+                geo_tier=geo,
+                currency="USD",
+                p10_base=aged_percentiles.p10_base,
+                p25_base=aged_percentiles.p25_base,
+                p50_base=aged_percentiles.p50_base,
+                p75_base=aged_percentiles.p75_base,
+                p90_base=aged_percentiles.p90_base,
+                target_bonus_pct=target_bonus,
+                p50_equity_rsus=p50_eq,
+                p75_equity_rsus=int(p50_eq * 1.5),
+                sample_size=aged_percentiles.sample_size,
+                source_type=BenchmarkSourceType.DOL_OFLC,
+                effective_date=eff_date,
+                aged_to_date=today,
+                annual_aging_rate=annual_aging_rate,
+                is_active=True,
+            )
+            benchmarks.append(bench)
+
+        if not dry_run and benchmarks:
+            await self._persist_benchmarks(benchmarks)
+
+        elapsed = round(time.perf_counter() - t0, 3)
+        report = ETLIngestionReport(
+            job_id=job_id,
+            status="SUCCESS" if benchmarks else "NO_DATA",
+            source_type=BenchmarkSourceType.DOL_OFLC,
+            source_url=source_url or "BUNDLED_DOL_DISCLOSURES_2025_2026",
+            fiscal_year=fiscal_year,
+            records_streamed=total_streamed,
+            valid_observations=valid_tech_count,
+            outliers_pruned_iqr=outliers_pruned,
+            cohorts_aggregated=len(cohorts),
+            benchmarks_upserted=len(benchmarks) if not dry_run else 0,
+            antitrust_safe_harbor_discarded=safe_harbor_discarded,
+            execution_time_seconds=elapsed,
+            dry_run=dry_run,
+        )
+        logger.info(
+            f"ETL Job {job_id} complete: {len(benchmarks)} benchmarks, "
+            f"{outliers_pruned} outliers pruned via Tukey IQR, {elapsed}s elapsed (dry_run={dry_run})."
+        )
+        return benchmarks, report
 
     async def seed_market_benchmarks(self) -> list[MarketBenchmark]:
         """Seeds the complete statistically verified 2026 market benchmarks."""

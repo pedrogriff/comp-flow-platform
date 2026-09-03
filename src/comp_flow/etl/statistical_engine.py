@@ -77,7 +77,9 @@ class BenchmarkStatisticalEngine:
 
         Formula: Wage_aged = Wage_effective * (1 + r) ^ (days / 365.25)
         """
-        rate = annual_rate if annual_rate is not None else cls.DEFAULT_ANNUAL_AGING_RATE
+        rate = (
+            Decimal(str(annual_rate)) if annual_rate is not None else cls.DEFAULT_ANNUAL_AGING_RATE
+        )
         days_diff = (target_date - effective_date).days
 
         if days_diff <= 0:

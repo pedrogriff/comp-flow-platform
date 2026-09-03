@@ -68,6 +68,38 @@ def benchmark_ingest_command(args: argparse.Namespace) -> None:
     asyncio.run(_run())
 
 
+def ingest_live_dol_command(args: argparse.Namespace) -> None:
+    """Streams and ingests public US DOL OFLC disclosure data with Tukey IQR cleansing."""
+
+    async def _run() -> None:
+        async with AsyncSessionLocal() as session:
+            pipeline = BenchmarkETLPipeline(session)
+            logger.info(
+                f"Starting live DOL OFLC ingestion (url={args.url or 'bundled'}, limit={args.limit}, dry_run={args.dry_run})..."
+            )
+            benchmarks, report = await pipeline.ingest_live_dol_dataset(
+                source_url=args.url,
+                fiscal_year=args.year,
+                max_records=args.limit,
+                annual_aging_rate=args.aging_rate,
+                dry_run=args.dry_run,
+            )
+            logger.info("==================================================")
+            logger.info(f"✅ Live DOL ETL Ingestion Complete: {report.job_id}")
+            logger.info(f"   Status:            {report.status}")
+            logger.info(f"   Source:            {report.source_url}")
+            logger.info(f"   Records Streamed:  {report.records_streamed:,}")
+            logger.info(f"   Valid Tech Rows:   {report.valid_observations:,}")
+            logger.info(f"   IQR Outliers Cut:  {report.outliers_pruned_iqr:,}")
+            logger.info(f"   Cohorts Created:   {report.cohorts_aggregated}")
+            logger.info(f"   Benchmarks Stored: {report.benchmarks_upserted}")
+            logger.info(f"   Safe Harbor Skips: {report.antitrust_safe_harbor_discarded}")
+            logger.info(f"   Execution Time:    {report.execution_time_seconds:.3f}s")
+            logger.info("==================================================")
+
+    asyncio.run(_run())
+
+
 def init_db_command(_args: argparse.Namespace) -> None:
     """Initializes database tables."""
     logger.info(f"Initializing database schema at {settings.DATABASE_URL}...")
@@ -105,6 +137,26 @@ def build_parser() -> argparse.ArgumentParser:
     )
     bench_ingest_p.add_argument("--file", type=str, required=True, help="Path to CSV file")
 
+    # ingest-live-dol
+    live_dol_p = subparsers.add_parser(
+        "ingest-live-dol", help="Stream and ingest public US DOL OFLC H-1B disclosure dataset"
+    )
+    live_dol_p.add_argument(
+        "--url", type=str, default=None, help="Remote URL or mirror to stream from"
+    )
+    live_dol_p.add_argument(
+        "--limit", type=int, default=None, help="Maximum number of records to ingest"
+    )
+    live_dol_p.add_argument(
+        "--year", type=int, default=2026, help="Target fiscal year for benchmark aging"
+    )
+    live_dol_p.add_argument(
+        "--aging-rate", type=float, default=0.040, help="Annual wage movement rate (e.g. 0.04)"
+    )
+    live_dol_p.add_argument(
+        "--dry-run", action="store_true", help="Execute calculations without writing to database"
+    )
+
     # init-db
     subparsers.add_parser("init-db", help="Create database schema tables")
 
@@ -124,6 +176,8 @@ def main() -> None:
         benchmark_seed_command(args)
     elif args.command == "benchmark-ingest":
         benchmark_ingest_command(args)
+    elif args.command == "ingest-live-dol":
+        ingest_live_dol_command(args)
     elif args.command == "init-db":
         init_db_command(args)
     else:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import io
+from collections.abc import AsyncIterator, Iterable, Iterator
 from datetime import date, datetime
 from decimal import Decimal
 
@@ -42,6 +43,40 @@ class DOLLCAParser:
                 observations.append(obs)
 
         return observations
+
+    @classmethod
+    def parse_line_stream(cls, lines: Iterable[str]) -> Iterator[RawWageObservation]:
+        """Memory-efficient streaming iterator parsing wage observations line by line."""
+        reader = csv.DictReader(lines)
+        for row in reader:
+            obs = cls._parse_single_row(row)
+            if obs:
+                yield obs
+
+    @classmethod
+    async def parse_async_line_stream(
+        cls, line_stream: AsyncIterator[str]
+    ) -> AsyncIterator[RawWageObservation]:
+        """Asynchronously parses lines yielding standardized RawWageObservation instances."""
+        headers: list[str] | None = None
+        async for line in line_stream:
+            line_str = line.strip()
+            if not line_str:
+                continue
+
+            reader = csv.reader([line_str])
+            row_vals = next(reader, None)
+            if not row_vals:
+                continue
+
+            if headers is None:
+                headers = [h.strip() for h in row_vals]
+                continue
+
+            row_dict = dict(zip(headers, row_vals, strict=False))
+            obs = cls._parse_single_row(row_dict)
+            if obs:
+                yield obs
 
     @classmethod
     def _parse_single_row(cls, row: dict[str, str]) -> RawWageObservation | None:

@@ -342,3 +342,38 @@ async def test_enterprise_seeder_integration(test_db_session: AsyncSession) -> N
     offers_res = await test_db_session.execute(select(CandidateOffer))
     offers = offers_res.scalars().all()
     assert len(offers) >= 3
+
+
+@pytest.mark.asyncio
+async def test_live_dol_etl_api_endpoints(
+    async_client: AsyncClient,
+    admin_token: str,
+    manager_token: str,
+) -> None:
+    """Verifies live DOL ETL ingestion trigger and telemetry retrieval via REST API."""
+    # 1. Non-admin forbidden from triggering ETL
+    forbid_res = await async_client.post(
+        "/api/v1/benchmarks/etl/ingest-live-dol",
+        headers={"Authorization": f"Bearer {manager_token}"},
+        json={"limit_records": 100, "dry_run": True},
+    )
+    assert forbid_res.status_code == 403
+
+    # 2. Admin triggers dry-run ETL ingestion
+    ingest_res = await async_client.post(
+        "/api/v1/benchmarks/etl/ingest-live-dol",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={"limit_records": 100, "dry_run": True},
+    )
+    assert ingest_res.status_code == 200
+    report = ingest_res.json()
+    assert report["status"] == "SUCCESS"
+    assert report["dry_run"] is True
+    assert report["records_streamed"] == 100
+    assert report["outliers_pruned_iqr"] >= 0
+
+    # 3. Fetch latest report (available to guests/unauthenticated users)
+    latest_res = await async_client.get("/api/v1/benchmarks/etl/latest-report")
+    assert latest_res.status_code == 200
+    latest_data = latest_res.json()
+    assert latest_data["job_id"] == report["job_id"]

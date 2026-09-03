@@ -161,3 +161,24 @@ class BenchmarkComparisonResult(BaseModel):
     within_market_band: bool = Field(
         ..., description="True if proposed base is between P10 and P90"
     )
+
+
+class ETLIngestionReport(BaseModel):
+    """Detailed telemetry and audit metrics produced by an ETL ingestion run."""
+
+    model_config = ConfigDict(frozen=True)
+
+    job_id: str
+    status: str
+    source_type: BenchmarkSourceType
+    source_url: str
+    fiscal_year: int
+    records_streamed: int
+    valid_observations: int
+    outliers_pruned_iqr: int
+    cohorts_aggregated: int
+    benchmarks_upserted: int
+    antitrust_safe_harbor_discarded: int
+    execution_time_seconds: float
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    dry_run: bool = False

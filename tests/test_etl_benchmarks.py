@@ -18,6 +18,7 @@ from comp_flow.domain.entities import Base
 from comp_flow.domain.models import JobFamily, JobLevel, LocationTier
 from comp_flow.etl.normalizer import BenchmarkNormalizer
 from comp_flow.etl.pipeline import BenchmarkETLPipeline
+from comp_flow.etl.sources.dol_fetcher import DOLLiveFetcher
 from comp_flow.etl.sources.dol_lca_parser import DOLLCAParser
 from comp_flow.etl.sources.seed_loader import BenchmarkSeedLoader
 from comp_flow.etl.statistical_engine import BenchmarkStatisticalEngine
@@ -293,5 +294,44 @@ I-200-05,CLOUD CORP,Principal Systems Architect,15-1244.00,415000,Year,San Franc
         assert ingested[0].job_family == JobFamily.SYSTEMS_INFRASTRUCTURE
         assert ingested[0].job_level == JobLevel.L8
         assert ingested[0].sample_size == 5
+
+    await engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_live_dol_fetcher_and_streaming_pipeline():
+    """Verifies DOLLiveFetcher streaming, Tukey IQR outlier trimming, and ETL report generation."""
+    fetcher = DOLLiveFetcher()
+    lines = []
+    async for line in fetcher.stream_lines():
+        lines.append(line)
+        if len(lines) >= 50:
+            break
+    assert len(lines) >= 50
+    assert "CASE_NUMBER" in lines[0]
+
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    async_session = async_sessionmaker(engine, expire_on_commit=False)
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    async with async_session() as session:
+        pipeline = BenchmarkETLPipeline(session)
+
+        # 1. Dry run
+        benchmarks, report = await pipeline.ingest_live_dol_dataset(max_records=200, dry_run=True)
+        assert report.status == "SUCCESS"
+        assert report.dry_run is True
+        assert report.records_streamed == 200
+        assert report.benchmarks_upserted == 0
+
+        # 2. Real ingestion
+        benchmarks, report = await pipeline.ingest_live_dol_dataset(max_records=500, dry_run=False)
+        assert report.status == "SUCCESS"
+        assert report.dry_run is False
+        assert report.records_streamed == 500
+        assert report.benchmarks_upserted > 0
+        assert report.outliers_pruned_iqr >= 0
 
     await engine.dispose()
