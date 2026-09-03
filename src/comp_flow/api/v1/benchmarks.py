@@ -183,7 +183,9 @@ async def trigger_live_dol_ingestion(
     _LATEST_ETL_REPORT = report
     if redis:
         try:
-            await redis.set("compflow:etl:latest_report", report.model_dump_json(), expire=86400)
+            await redis.set(
+                "compflow:etl:latest_report", report.model_dump_json(), expire_seconds=86400
+            )
         except Exception:
             pass
     return report
