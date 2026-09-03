@@ -167,6 +167,7 @@ _LATEST_ETL_REPORT: ETLIngestionReport | None = None
 async def trigger_live_dol_ingestion(
     request: LiveDOLIngestRequest = Body(default_factory=LiveDOLIngestRequest),
     db: AsyncSession = Depends(get_db),
+    redis: RedisManager | None = Depends(get_redis),
     _admin: User = Depends(require_roles(UserRole.HR_ADMIN)),
 ) -> ETLIngestionReport:
     """Streams and ingests public US DOL OFLC H-1B certified disclosures with Tukey IQR cleansing (HR_ADMIN only)."""
@@ -180,15 +181,29 @@ async def trigger_live_dol_ingestion(
         dry_run=request.dry_run,
     )
     _LATEST_ETL_REPORT = report
+    if redis:
+        try:
+            await redis.set("compflow:etl:latest_report", report.model_dump_json(), expire=86400)
+        except Exception:
+            pass
     return report
 
 
 @router.get("/etl/latest-report", response_model=ETLIngestionReport | None)
 async def get_latest_etl_report(
+    redis: RedisManager | None = Depends(get_redis),
     _user: User | None = Depends(get_optional_user),
 ) -> ETLIngestionReport | None:
     """Returns telemetry from the most recent ETL big data ingestion job."""
     global _LATEST_ETL_REPORT
+    if redis:
+        try:
+            cached = await redis.get("compflow:etl:latest_report")
+            if cached:
+                return ETLIngestionReport.model_validate_json(cached)
+        except Exception:
+            pass
+
     if _LATEST_ETL_REPORT is None:
         return ETLIngestionReport(
             job_id="job-dol-baseline-2026",
