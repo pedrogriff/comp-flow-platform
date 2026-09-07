@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from sqlalchemy import text
 
+from comp_flow.api.middleware import PrometheusMetricsMiddleware
 from comp_flow.api.v1 import api_v1_router
 from comp_flow.core.config import settings
 from comp_flow.core.database import AsyncSessionLocal, init_db
@@ -37,6 +38,9 @@ def create_app() -> FastAPI:
         openapi_url="/openapi.json",
         lifespan=lifespan,
     )
+
+    # SRE Observability Middleware (Prometheus SLI & Latency Tracking)
+    app.add_middleware(PrometheusMetricsMiddleware)
 
     # CORS Middleware
     app.add_middleware(

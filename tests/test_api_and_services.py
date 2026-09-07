@@ -43,6 +43,31 @@ async def test_system_healthz_and_readyz(async_client: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
+async def test_prometheus_http_metrics_and_sli_tracking(
+    async_client: AsyncClient, seeded_test_db: dict[str, Any]
+) -> None:
+    """Verifies that HTTP requests record SLI metrics and duration histograms with route normalization."""
+    # Execute a request to generate metrics
+    await async_client.post(
+        "/api/v1/auth/login",
+        json={"email": "wrong@test.com", "password": "bad"},
+    )
+
+    res_metrics = await async_client.get("/metrics")
+    assert res_metrics.status_code == 200
+    metrics_text = res_metrics.text
+
+    # Assert SRE SLI golden signals exist
+    assert "compflow_http_requests_total" in metrics_text
+    assert "compflow_http_request_duration_seconds" in metrics_text
+    assert "compflow_http_active_requests" in metrics_text
+
+    # Assert route normalization and status code tracking
+    assert 'handler="/auth/login"' in metrics_text
+    assert 'status_code="401"' in metrics_text
+
+
+@pytest.mark.asyncio
 async def test_auth_login_and_me(async_client: AsyncClient, seeded_test_db: dict[str, Any]) -> None:
     """Verifies user login with email/password and retrieving /me profile."""
     res_login = await async_client.post(
