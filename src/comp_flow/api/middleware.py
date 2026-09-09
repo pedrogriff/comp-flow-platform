@@ -14,6 +14,7 @@ from comp_flow.core.metrics import (
     HTTP_REQUEST_DURATION_SECONDS,
     HTTP_REQUESTS_TOTAL,
 )
+from comp_flow.core.tracing import get_current_trace_id
 
 
 class PrometheusMetricsMiddleware(BaseHTTPMiddleware):
@@ -40,6 +41,9 @@ class PrometheusMetricsMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
             status_code = response.status_code
+            trace_id = get_current_trace_id()
+            if trace_id:
+                response.headers["X-Trace-ID"] = trace_id
             return response
         except Exception:
             status_code = 500

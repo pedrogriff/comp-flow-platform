@@ -54,5 +54,12 @@ class Settings(BaseSettings):
         "https://compflow.homelab.local",
     ]
 
+    # OpenTelemetry & Distributed Tracing Settings
+    OTEL_ENABLED: bool = True
+    OTEL_SERVICE_NAME: str = "compflow-api"
+    OTEL_EXPORTER_OTLP_ENDPOINT: str = "http://otel-collector.monitoring.svc.cluster.local:4317"
+    OTEL_SAMPLING_RATIO: float = 1.0  # Full trace sampling in production homelab
+    OTEL_INSECURE_GRPC: bool = True
+
 
 settings = Settings()

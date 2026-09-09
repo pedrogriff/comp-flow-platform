@@ -6,6 +6,8 @@ import time
 from decimal import Decimal
 from typing import Any
 
+from comp_flow.core.metrics import AUDIT_DURATION_SECONDS, AUDIT_REQUESTS_TOTAL
+from comp_flow.core.tracing import trace_span
 from comp_flow.domain.models import (
     AgentAuditResult,
     AuditFinding,
@@ -56,99 +58,111 @@ class EmployeeCalibrationAgent:
 
         t0 = time.perf_counter()
 
-        target_band = band or get_default_salary_band(proposed_level, job_family, location_tier)
-        compa_ratio = calculate_compa_ratio(proposed_base, target_band.mid_base)
-        equity_ratio = (
-            Decimal(proposed_equity_rsus) / Decimal(target_band.target_equity_rsus)
-            if target_band.target_equity_rsus > 0
-            else Decimal("0.00")
-        )
-
-        findings: list[AuditFinding] = []
-
-        # 1. Base Salary Band Compliance
-        findings.append(verify_salary_band_compliance(proposed_base, target_band))
-
-        # 2. Bonus Formula Compliance
-        findings.append(
-            evaluate_bonus_compliance(
-                proposed_bonus=proposed_bonus,
-                proposed_base=proposed_base,
-                target_bonus_pct=target_band.target_bonus_pct,
-                individual_perf_factor=individual_perf_factor,
-                company_perf_factor=company_perf_factor,
+        with trace_span(
+            "compflow.audit.employee_review",
+            attributes={
+                "compflow.review_id": review_id,
+                "compflow.current_level": current_level.value,
+                "compflow.proposed_level": proposed_level.value,
+                "compflow.job_family": job_family.value,
+                "compflow.location_tier": location_tier.value,
+            },
+        ):
+            target_band = band or get_default_salary_band(proposed_level, job_family, location_tier)
+            compa_ratio = calculate_compa_ratio(proposed_base, target_band.mid_base)
+            equity_ratio = (
+                Decimal(proposed_equity_rsus) / Decimal(target_band.target_equity_rsus)
+                if target_band.target_equity_rsus > 0
+                else Decimal("0.00")
             )
-        )
 
-        # 3. Equity Guideline Compliance
-        findings.append(
-            evaluate_equity_guidelines(
-                proposed_rsus=proposed_equity_rsus,
-                band=target_band,
-                rating=performance_rating,
-            )
-        )
+            findings: list[AuditFinding] = []
 
-        # 4. Base Increase Velocity Compliance
-        findings.append(
-            evaluate_base_increase_velocity(
-                current_base=current_base,
-                proposed_base=proposed_base,
-                rating=performance_rating,
-            )
-        )
+            # 1. Base Salary Band Compliance
+            findings.append(verify_salary_band_compliance(proposed_base, target_band))
 
-        # 5. Promotion Compliance (if level changed)
-        if current_level != proposed_level:
+            # 2. Bonus Formula Compliance
             findings.append(
-                evaluate_promotion_compliance(
-                    current_level=current_level,
-                    proposed_level=proposed_level,
+                evaluate_bonus_compliance(
+                    proposed_bonus=proposed_bonus,
                     proposed_base=proposed_base,
-                    new_band=target_band,
+                    target_bonus_pct=target_band.target_bonus_pct,
+                    individual_perf_factor=individual_perf_factor,
+                    company_perf_factor=company_perf_factor,
                 )
             )
 
-        # Synthesis & Action
-        critical_violations = [f for f in findings if f.severity == "CRITICAL" and not f.passed]
-        warnings = [f for f in findings if f.severity == "WARNING" and not f.passed]
-
-        # Policy: Needs improvement rating with salary increase -> Hard REJECT
-        if (
-            performance_rating == PerformanceRating.NEEDS_IMPROVEMENT
-            and proposed_base > current_base
-        ):
-            decision = ReviewStatus.REJECTED.value
-            rationale = (
-                f"REJECTED: Employee rated {performance_rating.value} is ineligible for "
-                f"base salary increases under corporate governance policy."
-            )
-        elif critical_violations or warnings:
-            decision = ReviewStatus.VP_EXCEPTION_REQUIRED.value
-            issues = [f.details for f in (critical_violations + warnings)]
-            rationale = (
-                f"ESCALATED TO VP COMMITTEE: Proposal contains {len(issues)} exception item(s) "
-                f"requiring approval: {'; '.join(issues)}."
-            )
-        else:
-            decision = ReviewStatus.AUTO_APPROVED.value
-            rationale = (
-                f"AUTO-APPROVED: Proposal fully satisfies salary band parity (Compa: {compa_ratio:.3f}), "
-                f"bonus formula, equity guidelines ({equity_ratio:.2f}x of target for {performance_rating.value}), "
-                f"and merit velocity caps."
+            # 3. Equity Guideline Compliance
+            findings.append(
+                evaluate_equity_guidelines(
+                    proposed_rsus=proposed_equity_rsus,
+                    band=target_band,
+                    rating=performance_rating,
+                )
             )
 
-        elapsed = time.perf_counter() - t0
+            # 4. Base Increase Velocity Compliance
+            findings.append(
+                evaluate_base_increase_velocity(
+                    current_base=current_base,
+                    proposed_base=proposed_base,
+                    rating=performance_rating,
+                )
+            )
 
-        return AgentAuditResult(
-            target_id=review_id,
-            decision=decision,
-            findings=findings,
-            compa_ratio=compa_ratio,
-            equity_guideline_ratio=equity_ratio,
-            rationale=rationale,
-            execution_time_seconds=elapsed,
-        )
+            # 5. Promotion Compliance (if level changed)
+            if current_level != proposed_level:
+                findings.append(
+                    evaluate_promotion_compliance(
+                        current_level=current_level,
+                        proposed_level=proposed_level,
+                        proposed_base=proposed_base,
+                        new_band=target_band,
+                    )
+                )
+
+            # Synthesis & Action
+            critical_violations = [f for f in findings if f.severity == "CRITICAL" and not f.passed]
+            warnings = [f for f in findings if f.severity == "WARNING" and not f.passed]
+
+            # Policy: Needs improvement rating with salary increase -> Hard REJECT
+            if (
+                performance_rating == PerformanceRating.NEEDS_IMPROVEMENT
+                and proposed_base > current_base
+            ):
+                decision = ReviewStatus.REJECTED.value
+                rationale = (
+                    f"REJECTED: Employee rated {performance_rating.value} is ineligible for "
+                    f"base salary increases under corporate governance policy."
+                )
+            elif critical_violations or warnings:
+                decision = ReviewStatus.VP_EXCEPTION_REQUIRED.value
+                issues = [f.details for f in (critical_violations + warnings)]
+                rationale = (
+                    f"ESCALATED TO VP COMMITTEE: Proposal contains {len(issues)} exception item(s) "
+                    f"requiring approval: {'; '.join(issues)}."
+                )
+            else:
+                decision = ReviewStatus.AUTO_APPROVED.value
+                rationale = (
+                    f"AUTO-APPROVED: Proposal fully satisfies salary band parity (Compa: {compa_ratio:.3f}), "
+                    f"bonus formula, equity guidelines ({equity_ratio:.2f}x of target for {performance_rating.value}), "
+                    f"and merit velocity caps."
+                )
+
+            elapsed = time.perf_counter() - t0
+            AUDIT_REQUESTS_TOTAL.labels(workflow_type="employee_review", decision=decision).inc()
+            AUDIT_DURATION_SECONDS.labels(workflow_type="employee_review").observe(elapsed)
+
+            return AgentAuditResult(
+                target_id=review_id,
+                decision=decision,
+                findings=findings,
+                compa_ratio=compa_ratio,
+                equity_guideline_ratio=equity_ratio,
+                rationale=rationale,
+                execution_time_seconds=elapsed,
+            )
 
 
 class OfferApprovalAgent:
@@ -172,61 +186,72 @@ class OfferApprovalAgent:
 
         t0 = time.perf_counter()
 
-        target_band = band or get_default_salary_band(job_level, job_family, location_tier)
-        compa_ratio = calculate_compa_ratio(proposed_base, target_band.mid_base)
-        equity_ratio = (
-            Decimal(proposed_equity_rsus) / Decimal(target_band.target_equity_rsus)
-            if target_band.target_equity_rsus > 0
-            else Decimal("0.00")
-        )
-
-        findings = evaluate_candidate_offer_compliance(
-            proposed_base=proposed_base,
-            sign_on_bonus=sign_on_bonus,
-            proposed_equity_rsus=proposed_equity_rsus,
-            band=target_band,
-        )
-
-        critical_violations = [f for f in findings if f.severity == "CRITICAL" and not f.passed]
-        warnings = [f for f in findings if f.severity == "WARNING" and not f.passed]
-
-        if (
-            compa_ratio > Decimal("1.200")
-            or sign_on_bonus > Decimal("50000.00")
-            or critical_violations
+        with trace_span(
+            "compflow.audit.candidate_offer",
+            attributes={
+                "compflow.offer_id": offer_id,
+                "compflow.job_level": job_level.value,
+                "compflow.job_family": job_family.value,
+                "compflow.location_tier": location_tier.value,
+            },
         ):
-            decision = OfferStatus.VP_EXCEPTION_REQUIRED.value
-            issues = [f.details for f in (critical_violations + warnings)]
-            rationale = (
-                f"VP EXCEPTION REQUIRED: Candidate offer package exceeds standard parameters: "
-                f"{'; '.join(issues) if issues else 'Compa-ratio > 1.20 or sign-on > $50k'}."
+            target_band = band or get_default_salary_band(job_level, job_family, location_tier)
+            compa_ratio = calculate_compa_ratio(proposed_base, target_band.mid_base)
+            equity_ratio = (
+                Decimal(proposed_equity_rsus) / Decimal(target_band.target_equity_rsus)
+                if target_band.target_equity_rsus > 0
+                else Decimal("0.00")
             )
-        elif warnings:
-            decision = OfferStatus.VP_EXCEPTION_REQUIRED.value
-            issues = [f.details for f in warnings]
-            rationale = f"VP EXCEPTION REQUIRED: {'; '.join(issues)}."
-        else:
-            decision = OfferStatus.OFFER_APPROVED.value
-            totals = calculate_offer_total_comp(
+
+            findings = evaluate_candidate_offer_compliance(
                 proposed_base=proposed_base,
                 sign_on_bonus=sign_on_bonus,
-                target_bonus_pct=target_band.target_bonus_pct,
                 proposed_equity_rsus=proposed_equity_rsus,
-            )
-            rationale = (
-                f"OFFER APPROVED: Package complies with {job_level.value} {location_tier.value} guidelines "
-                f"(Compa-Ratio: {compa_ratio:.3f}, TTC: ${totals['total_target_cash']:,.2f}, "
-                f"First Year Total Comp: ${totals['first_year_total_comp']:,.2f})."
+                band=target_band,
             )
 
-        elapsed = time.perf_counter() - t0
+            critical_violations = [f for f in findings if f.severity == "CRITICAL" and not f.passed]
+            warnings = [f for f in findings if f.severity == "WARNING" and not f.passed]
 
-        return AgentAuditResult(
-            target_id=offer_id,
-            decision=decision,
-            findings=findings,
-            compa_ratio=compa_ratio,
-            equity_guideline_ratio=equity_ratio,
-            rationale=rationale,
-            execution_time_seconds=elapsed,
-        )
+            if (
+                compa_ratio > Decimal("1.200")
+                or sign_on_bonus > Decimal("50000.00")
+                or critical_violations
+            ):
+                decision = OfferStatus.VP_EXCEPTION_REQUIRED.value
+                issues = [f.details for f in (critical_violations + warnings)]
+                rationale = (
+                    f"VP EXCEPTION REQUIRED: Candidate offer package exceeds standard parameters: "
+                    f"{'; '.join(issues) if issues else 'Compa-ratio > 1.20 or sign-on > $50k'}."
+                )
+            elif warnings:
+                decision = OfferStatus.VP_EXCEPTION_REQUIRED.value
+                issues = [f.details for f in warnings]
+                rationale = f"VP EXCEPTION REQUIRED: {'; '.join(issues)}."
+            else:
+                decision = OfferStatus.OFFER_APPROVED.value
+                totals = calculate_offer_total_comp(
+                    proposed_base=proposed_base,
+                    sign_on_bonus=sign_on_bonus,
+                    target_bonus_pct=target_band.target_bonus_pct,
+                    proposed_equity_rsus=proposed_equity_rsus,
+                )
+                rationale = (
+                    f"OFFER APPROVED: Package complies with {job_level.value} {location_tier.value} guidelines "
+                    f"(Compa-Ratio: {compa_ratio:.3f}, TTC: ${totals['total_target_cash']:,.2f}, "
+                    f"First Year Total Comp: ${totals['first_year_total_comp']:,.2f})."
+                )
+
+            elapsed = time.perf_counter() - t0
+            AUDIT_REQUESTS_TOTAL.labels(workflow_type="candidate_offer", decision=decision).inc()
+            AUDIT_DURATION_SECONDS.labels(workflow_type="candidate_offer").observe(elapsed)
+
+            return AgentAuditResult(
+                target_id=offer_id,
+                decision=decision,
+                findings=findings,
+                compa_ratio=compa_ratio,
+                equity_guideline_ratio=equity_ratio,
+                rationale=rationale,
+                execution_time_seconds=elapsed,
+            )

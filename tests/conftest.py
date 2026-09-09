@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from comp_flow.api.app import app
+from comp_flow.core.config import settings
 from comp_flow.core.database import get_db
 from comp_flow.core.security import create_access_token, hash_password
 from comp_flow.domain.entities import Base, Department, Employee, SalaryBand, User
@@ -27,6 +28,10 @@ from comp_flow.domain.models import (
     UserRole,
 )
 from comp_flow.tools.registry import get_default_salary_band
+
+# Configure test environment
+settings.ENVIRONMENT = "test"
+settings.OTEL_ENABLED = True
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 

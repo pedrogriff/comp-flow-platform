@@ -13,8 +13,9 @@ from sqlalchemy import text
 from comp_flow.api.middleware import PrometheusMetricsMiddleware
 from comp_flow.api.v1 import api_v1_router
 from comp_flow.core.config import settings
-from comp_flow.core.database import AsyncSessionLocal, init_db
+from comp_flow.core.database import AsyncSessionLocal, engine, init_db
 from comp_flow.core.redis import redis_client
+from comp_flow.core.tracing import setup_tracing
 
 
 @asynccontextmanager
@@ -38,6 +39,9 @@ def create_app() -> FastAPI:
         openapi_url="/openapi.json",
         lifespan=lifespan,
     )
+
+    # OpenTelemetry Distributed Tracing Setup (FastAPI, SQLAlchemy, Redis)
+    setup_tracing(app=app, engine=engine)
 
     # SRE Observability Middleware (Prometheus SLI & Latency Tracking)
     app.add_middleware(PrometheusMetricsMiddleware)

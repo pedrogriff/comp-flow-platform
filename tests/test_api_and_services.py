@@ -68,6 +68,22 @@ async def test_prometheus_http_metrics_and_sli_tracking(
 
 
 @pytest.mark.asyncio
+async def test_opentelemetry_distributed_tracing_and_trace_id_header(
+    async_client: AsyncClient, seeded_test_db: dict[str, Any]
+) -> None:
+    """Verifies that requests generate distributed traces and inject X-Trace-ID response headers for TSE triage."""
+    res = await async_client.post(
+        "/api/v1/auth/login",
+        json={"email": "admin@test.com", "password": "Password123!"},
+    )
+    assert res.status_code == 200
+    assert "X-Trace-ID" in res.headers
+    trace_id = res.headers["X-Trace-ID"]
+    assert len(trace_id) == 32
+    assert all(c in "0123456789abcdef" for c in trace_id)
+
+
+@pytest.mark.asyncio
 async def test_auth_login_and_me(async_client: AsyncClient, seeded_test_db: dict[str, Any]) -> None:
     """Verifies user login with email/password and retrieving /me profile."""
     res_login = await async_client.post(
