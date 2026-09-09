@@ -4,7 +4,7 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Type Checked: MyPy Strict](https://img.shields.io/badge/types-mypy%20strict-brightgreen.svg)](https://mypy-lang.org/)
-[![Test Coverage: 100% Core](https://img.shields.io/badge/coverage-31%20tests%20passing-brightgreen.svg)]()
+[![Test Coverage: 100% Core](https://img.shields.io/badge/coverage-61%20tests%20passing-brightgreen.svg)]()
 [![GitOps: ArgoCD](https://img.shields.io/badge/GitOps-ArgoCD-orange.svg)](https://github.com/pedrogriff/homelab-k8s-talos)
 [![Kubernetes: Talos](https://img.shields.io/badge/Kubernetes-Talos%20Baremetal-blue.svg)](https://github.com/pedrogriff/homelab-k8s-talos)
 
