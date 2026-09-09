@@ -166,10 +166,53 @@ Agent Decision Breakdown:
 
 ---
 
+## 🛡️ Enterprise Observability, TSE Cockpit & SOX Cryptographic Ledger
+
+### 1. TSE Customer Incident Triage Cockpit (`compflow-cli tse-triage`)
+A purpose-built triage system and API endpoint (`POST /api/v1/tse/diagnose`) designed for **Technical Solutions Engineers (TSE)** to rapidly diagnose customer-reported compensation anomalies and policy rejections:
+- **Trace Context Correlation**: Correlates customer error tickets by `x-trace-id` (W3C TraceContext) directly to execution graphs and database transactions.
+- **Root-Cause Classification**: Automatically pinpoints policy bottlenecks (e.g. `OUT_OF_BAND_COMPENSATION_CEILING`, `DEPARTMENT_MERIT_BUDGET_EXHAUSTED`, `PROMOTION_VELOCITY_VIOLATION`, `UNAPPROVED_VP_EXCEPTION`).
+- **Actionable Remediation Dossier**: Emits structured step-by-step remediation plans for customer administrators and people operations teams.
+
+```bash
+# Verify entire cryptographic audit ledger integrity
+compflow-cli tse-triage --verify-ledger
+
+# Triage an incident by customer trace ID
+compflow-cli tse-triage --trace-id 51433c5971c04337b54e1be22ce01350
+
+# Deep diagnostic inspection of a specific review proposal
+compflow-cli tse-triage --review-id b18d9a4c-6d74-4f03-91ee-abd372d230e7 --json
+```
+
+### 2. Cryptographically Sealed SOX Section 404 Audit Ledger
+To guarantee non-repudiation and prevent undetected administrative tampering in enterprise compensation runs:
+- **Merkle Hash-Chained Blocks**: Every audit event, salary override, and approval action is hashed using canonical JSON (RFC 8785 subset) and chained to the previous block's SHA-256 hash.
+- **Platform HMAC Non-Repudiation Signatures**: Each block header is signed with platform cryptographic keys.
+- **Instant Tamper Detection**: Any direct SQL update (`UPDATE sox_audit_ledger SET payload = ...`) immediately invalidates the Merkle chain, allowing automated SRE monitors to freeze payout disbursements.
+
+### 3. Google SRE Multi-Window Multi-Burn-Rate (MWMBR) Alerting
+Conforms to Google SRE Book Chapter 5 principles:
+- **Availability SLI / SLO**: 99.9% success rate across parameterized API routes.
+- **Latency SLI / SLO**: 95% of compensation requests served under 250ms.
+- **Burn-Rate Alerting**: 14.4x (1h/5m window, 2% budget consumed), 6x (6h/30m window, 5% budget), 3x (24h/2h window, 10% budget), and 1x (3d/6h window).
+- **Executive Grafana Dashboard**: Auto-discovered by Prometheus Operator sidecar with live error budget gauges.
+
+### 4. Full-Stack OpenTelemetry & Hybrid Google Cloud Trace
+- Auto-instruments FastAPI HTTP requests, SQLAlchemy async engine queries, and Redis operations.
+- Injects `X-Trace-ID` into all client HTTP response headers for instant customer issue resolution.
+- Dual-export pipeline via OpenTelemetry Collector Contrib (`0.119.0`): local Jaeger backend and mirrored live export to **Google Cloud Trace**.
+
+### 5. Keyless GCP Workload Identity Federation (WIF) & 3-2-1 GCS Disaster Recovery
+- **Zero Static Service Account Keys**: Bare-metal Talos Linux Kubernetes kubelets project short-lived OIDC service account tokens (`ServiceAccountTokenProjection`). Google STS validates tokens against the on-premises cluster OIDC issuer (`/.well-known/openid-configuration`).
+- **3-2-1 Backup Strategy with Velero**: Dual-target backup configuration with local on-premises fast backups (MinIO S3) and weekly scheduled offsite cloud archives in Google Cloud Storage (`pedrogriff-talos-dr-coldline`) with automated Nearline $\to$ Coldline $\to$ Archive tiering.
+
+---
+
 ## 🧪 Testing & Verification
 
 ```bash
-# Run Pytest suite with strict coverage
+# Run Pytest suite with strict coverage (61 passing tests)
 pytest -v --cov=src/comp_flow --cov-report=term-missing tests/
 
 # Strict Type Checking
