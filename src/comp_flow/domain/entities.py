@@ -190,6 +190,11 @@ class Employee(Base):
         "EmployeeReview", back_populates="employee"
     )
 
+    @property
+    def full_name(self) -> str:
+        """Returns employee full name."""
+        return f"{self.first_name} {self.last_name}"
+
 
 class CompensationCycle(Base):
     """Annual / Bi-annual Compensation Planning Cycle."""
@@ -493,3 +498,29 @@ class MarketBenchmark(Base):
             name="uq_benchmark_family_level_geo_source",
         ),
     )
+
+
+class SoxLedgerEntry(Base):
+    """Cryptographically sealed, hash-chained SOX Section 404 audit ledger entry."""
+
+    __tablename__ = "sox_audit_ledger"
+
+    sequence_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    entry_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), unique=True, nullable=False, default=uuid.uuid4
+    )
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utc_now, nullable=False, index=True
+    )
+    trace_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    entity_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    entity_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False, index=True)
+    action: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    actor_email: Mapped[str] = mapped_column(String(255), nullable=False)
+    payload: Mapped[dict[str, Any]] = mapped_column(
+        JSON().with_variant(JSONB, "postgresql"), nullable=False
+    )
+    payload_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    previous_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    block_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
+    signature: Mapped[str] = mapped_column(String(64), nullable=False)

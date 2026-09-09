@@ -9,6 +9,7 @@ from comp_flow.api.v1.benchmarks import router as benchmarks_router
 from comp_flow.api.v1.cycles import router as cycles_router
 from comp_flow.api.v1.offers import router as offers_router
 from comp_flow.api.v1.planning import router as planning_router
+from comp_flow.api.v1.tse import router as tse_router
 
 api_v1_router = APIRouter(prefix="/api/v1")
 api_v1_router.include_router(auth_router)
@@ -18,5 +19,6 @@ api_v1_router.include_router(cycles_router)
 api_v1_router.include_router(planning_router)
 api_v1_router.include_router(offers_router)
 api_v1_router.include_router(analytics_router)
+api_v1_router.include_router(tse_router)
 
 __all__ = ["api_v1_router"]

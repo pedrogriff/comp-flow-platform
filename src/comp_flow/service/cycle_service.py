@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from comp_flow.agent.orchestrator import EmployeeCalibrationAgent
+from comp_flow.core.ledger import SoxLedgerService
 from comp_flow.core.metrics import AUDIT_REQUESTS_TOTAL, PROPOSALS_TOTAL
 from comp_flow.domain.entities import (
     AuditLog,
@@ -273,6 +274,25 @@ class CycleService:
         db.add(audit_log)
         await db.flush()
 
+        # 6. Append cryptographically sealed SOX ledger block
+        await SoxLedgerService.record_entry(
+            db=db,
+            entity_type="EMPLOYEE_REVIEW",
+            entity_id=proposal.id,
+            action="AGENT_AUDIT",
+            actor_email=actor_email,
+            payload={
+                "previous_status": prev_status.value,
+                "new_status": new_status.value,
+                "current_base": str(proposal.current_base),
+                "proposed_base": str(proposal.proposed_base),
+                "proposed_bonus": str(proposal.proposed_bonus_amount),
+                "proposed_equity_rsus": proposal.proposed_equity_rsus,
+                "compa_ratio": str(audit_res.compa_ratio),
+                "decision": audit_res.decision,
+            },
+        )
+
         AUDIT_REQUESTS_TOTAL.labels(
             workflow_type="employee_review", decision=new_status.value
         ).inc()
@@ -353,6 +373,21 @@ class CycleService:
         )
         db.add(log)
         await db.flush()
+
+        # Append cryptographically sealed SOX ledger block
+        await SoxLedgerService.record_entry(
+            db=db,
+            entity_type="EMPLOYEE_REVIEW",
+            entity_id=proposal.id,
+            action="VP_APPROVAL",
+            actor_email=actor_email,
+            payload={
+                "previous_status": prev.value,
+                "new_status": ReviewStatus.VP_APPROVED.value,
+                "notes": notes,
+                "proposed_base": str(proposal.proposed_base),
+            },
+        )
 
         PROPOSALS_TOTAL.labels(status=ReviewStatus.VP_APPROVED.value).inc()
         return proposal

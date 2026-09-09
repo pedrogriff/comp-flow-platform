@@ -10,6 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from comp_flow.agent.orchestrator import OfferApprovalAgent
+from comp_flow.core.ledger import SoxLedgerService
 from comp_flow.core.metrics import AUDIT_REQUESTS_TOTAL, OFFERS_TOTAL
 from comp_flow.domain.entities import AuditLog, CandidateOffer, User
 from comp_flow.domain.models import (
@@ -156,6 +157,24 @@ class OfferService:
         db.add(log)
         await db.flush()
 
+        # Record cryptographically sealed SOX ledger block
+        await SoxLedgerService.record_entry(
+            db=db,
+            entity_type="CANDIDATE_OFFER",
+            entity_id=offer.id,
+            action="OFFER_AUDIT",
+            actor_email=actor_email,
+            payload={
+                "previous_status": prev.value,
+                "new_status": new_status.value,
+                "proposed_base": str(offer.proposed_base),
+                "sign_on_bonus": str(offer.sign_on_bonus),
+                "proposed_equity_rsus": offer.proposed_equity_rsus,
+                "compa_ratio": str(audit_res.compa_ratio),
+                "decision": audit_res.decision,
+            },
+        )
+
         AUDIT_REQUESTS_TOTAL.labels(
             workflow_type="candidate_offer", decision=new_status.value
         ).inc()
@@ -193,6 +212,21 @@ class OfferService:
         )
         db.add(log)
         await db.flush()
+
+        # Record cryptographically sealed SOX ledger block
+        await SoxLedgerService.record_entry(
+            db=db,
+            entity_type="CANDIDATE_OFFER",
+            entity_id=offer.id,
+            action="OFFER_APPROVAL",
+            actor_email=actor_email,
+            payload={
+                "previous_status": prev.value,
+                "new_status": OfferStatus.OFFER_APPROVED.value,
+                "notes": notes,
+                "proposed_base": str(offer.proposed_base),
+            },
+        )
 
         OFFERS_TOTAL.labels(status=OfferStatus.OFFER_APPROVED.value).inc()
         return offer

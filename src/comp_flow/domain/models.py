@@ -456,3 +456,83 @@ class DepartmentBudgetRollup(BaseModel):
     allocated_equity_pool: int
     depleted_equity_pool: int
     equity_pool_depletion_pct: Decimal
+
+
+# --- SOX Audit Ledger & TSE Triage Models ---
+
+
+class SoxLedgerEntryResponse(BaseModel):
+    """Immutable SOX 404 cryptographic ledger block record."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    sequence_id: int
+    entry_id: UUID
+    timestamp: datetime
+    trace_id: str
+    entity_type: str
+    entity_id: UUID
+    action: str
+    actor_email: str
+    payload: dict[str, Any]
+    payload_hash: str
+    previous_hash: str
+    block_hash: str
+    signature: str
+
+
+class LedgerVerificationResult(BaseModel):
+    """Cryptographic audit verification status of the SOX ledger."""
+
+    is_valid: bool
+    status: str  # "SECURE" or "COMPROMISED"
+    total_entries: int
+    genesis_hash: str | None = None
+    head_hash: str | None = None
+    tampered_sequence_id: int | None = None
+    tampered_entry_id: UUID | None = None
+    error_reason: str | None = None
+    verified_at: datetime
+
+
+class TseDiagnosticRequest(BaseModel):
+    """Customer incident diagnostic query for TSE engineers."""
+
+    trace_id: str | None = None
+    review_id: UUID | None = None
+    offer_id: UUID | None = None
+
+
+class TseAuditFindingReport(BaseModel):
+    """Structured compliance rule evaluation for TSE reports."""
+
+    rule_name: str
+    passed: bool
+    details: str
+    severity: str  # "INFO", "WARNING", "CRITICAL"
+
+
+class TseDiagnosticReport(BaseModel):
+    """Comprehensive technical incident triage dossier for customer-facing support."""
+
+    incident_id: UUID
+    timestamp: datetime
+    trace_id: str | None = None
+    entity_type: str  # "EMPLOYEE_REVIEW", "CANDIDATE_OFFER", "UNKNOWN"
+    entity_id: UUID | None = None
+    target_name: str | None = None
+    current_status: str | None = None
+    job_level: str | None = None
+    job_family: str | None = None
+    location_tier: str | None = None
+    current_base: Decimal | None = None
+    proposed_base: Decimal | None = None
+    compa_ratio: Decimal | None = None
+    salary_band_mid: Decimal | None = None
+    ledger_integrity: LedgerVerificationResult
+    policy_findings: list[TseAuditFindingReport] = Field(default_factory=list)
+    root_cause_category: str
+    customer_summary: str
+    technical_analysis: str
+    recommended_actions: list[str]
+    execution_time_ms: float = 0.0

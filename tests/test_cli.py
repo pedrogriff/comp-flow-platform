@@ -31,6 +31,16 @@ class TestCLI(unittest.TestCase):
         args = self.parser.parse_args(["init-db"])
         self.assertEqual(args.command, "init-db")
 
+    def test_tse_triage_command_args(self) -> None:
+        """Verifies parsing of tse-triage arguments."""
+        args = self.parser.parse_args(
+            ["tse-triage", "--trace-id", "trace_123", "--verify-ledger", "--json"]
+        )
+        self.assertEqual(args.command, "tse-triage")
+        self.assertEqual(args.trace_id, "trace_123")
+        self.assertTrue(args.verify_ledger)
+        self.assertTrue(args.json)
+
 
 if __name__ == "__main__":
     unittest.main()
