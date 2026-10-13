@@ -89,8 +89,8 @@ class CompensationWorkflowEngine:
             current_base=p.current_base,
             proposed_base=p.proposed_base,
             proposed_bonus=bonus,
-            individual_perf_factor=Decimal("1.00"),
-            company_perf_factor=Decimal("1.00"),
+            individual_multiplier=Decimal("1.00"),
+            company_multiplier=Decimal("1.00"),
             proposed_equity_rsus=p.proposed_equity_rsus,
             performance_rating=p.performance_rating,
         )

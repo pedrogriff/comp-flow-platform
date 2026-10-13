@@ -45,10 +45,10 @@ class EmployeeCalibrationAgent:
         current_base: Decimal,
         proposed_base: Decimal,
         proposed_bonus: Decimal,
-        individual_perf_factor: Decimal,
-        company_perf_factor: Decimal,
+        individual_multiplier: Decimal,
+        company_multiplier: Decimal,
         proposed_equity_rsus: int = 0,
-        performance_rating: PerformanceRating = PerformanceRating.CONSISTENTLY_MEETS,
+        performance_rating: PerformanceRating = PerformanceRating.RATING_2,
         band: SalaryBandBase | None = None,
         **kwargs: Any,
     ) -> AgentAuditResult:
@@ -87,8 +87,8 @@ class EmployeeCalibrationAgent:
                     proposed_bonus=proposed_bonus,
                     proposed_base=proposed_base,
                     target_bonus_pct=target_band.target_bonus_pct,
-                    individual_perf_factor=individual_perf_factor,
-                    company_perf_factor=company_perf_factor,
+                    individual_multiplier=individual_multiplier,
+                    company_multiplier=company_multiplier,
                 )
             )
 
@@ -125,11 +125,8 @@ class EmployeeCalibrationAgent:
             critical_violations = [f for f in findings if f.severity == "CRITICAL" and not f.passed]
             warnings = [f for f in findings if f.severity == "WARNING" and not f.passed]
 
-            # Policy: Needs improvement rating with salary increase -> Hard REJECT
-            if (
-                performance_rating == PerformanceRating.NEEDS_IMPROVEMENT
-                and proposed_base > current_base
-            ):
+            # Policy: Rating 1 with salary increase -> Hard REJECT
+            if performance_rating == PerformanceRating.RATING_1 and proposed_base > current_base:
                 decision = ReviewStatus.REJECTED.value
                 rationale = (
                     f"REJECTED: Employee rated {performance_rating.value} is ineligible for "

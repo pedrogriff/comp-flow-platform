@@ -26,7 +26,7 @@ class TestWorkflowEngine(unittest.TestCase):
             current_base=Decimal("280000.00"),
             proposed_base=Decimal("300000.00"),
             proposed_equity_rsus=1600,  # Target: 1400
-            performance_rating=PerformanceRating.EXCEEDS,
+            performance_rating=PerformanceRating.RATING_3,
         )
 
         self.engine.register_draft(proposal)
@@ -50,7 +50,7 @@ class TestWorkflowEngine(unittest.TestCase):
             current_base=Decimal("220000.00"),
             proposed_base=Decimal("295000.00"),  # Exceeds max ($290k)
             proposed_equity_rsus=900,
-            performance_rating=PerformanceRating.SUPERB,
+            performance_rating=PerformanceRating.RATING_5,
         )
 
         self.engine.register_draft(proposal)

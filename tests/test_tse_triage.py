@@ -47,7 +47,7 @@ async def test_tse_triage_compliant_review(
         cycle_type="MERIT_ANNUAL",
         global_merit_budget_pct=Decimal("4.50"),
         bonus_pool_funding_pct=Decimal("100.00"),
-        company_performance_factor=Decimal("1.00"),
+        company_multiplier=Decimal("1.00"),
         status=CycleStatus.ACTIVE,
         start_date=date(2026, 1, 1),
         end_date=date(2026, 12, 31),
@@ -65,7 +65,7 @@ async def test_tse_triage_compliant_review(
         proposed_base=Decimal("250000.00"),
         proposed_bonus_amount=Decimal("37500.00"),
         proposed_equity_rsus=900,
-        performance_rating=PerformanceRating.CONSISTENTLY_MEETS,
+        performance_rating=PerformanceRating.RATING_2,
         status=ReviewStatus.AUTO_APPROVED,
         justification_notes="Consistent high deliverable execution",
     )
@@ -118,7 +118,7 @@ async def test_tse_triage_out_of_band_ceiling(
         cycle_type="MERIT_ANNUAL",
         global_merit_budget_pct=Decimal("4.50"),
         bonus_pool_funding_pct=Decimal("100.00"),
-        company_performance_factor=Decimal("1.00"),
+        company_multiplier=Decimal("1.00"),
         status=CycleStatus.ACTIVE,
         start_date=date(2026, 1, 1),
         end_date=date(2026, 12, 31),
@@ -136,7 +136,7 @@ async def test_tse_triage_out_of_band_ceiling(
         proposed_base=Decimal("350000.00"),
         proposed_bonus_amount=Decimal("52500.00"),
         proposed_equity_rsus=1500,
-        performance_rating=PerformanceRating.CONSISTENTLY_MEETS,
+        performance_rating=PerformanceRating.RATING_2,
         status=ReviewStatus.VP_EXCEPTION_REQUIRED,
         justification_notes="Executive market adjustment requested",
     )
@@ -183,7 +183,7 @@ async def test_tse_trace_id_correlation(
         cycle_type="MERIT_ANNUAL",
         global_merit_budget_pct=Decimal("4.50"),
         bonus_pool_funding_pct=Decimal("100.00"),
-        company_performance_factor=Decimal("1.00"),
+        company_multiplier=Decimal("1.00"),
         status=CycleStatus.ACTIVE,
         start_date=date(2026, 1, 1),
         end_date=date(2026, 12, 31),
@@ -200,7 +200,7 @@ async def test_tse_trace_id_correlation(
         proposed_base=Decimal("185000.00"),
         proposed_bonus_amount=Decimal("27750.00"),
         proposed_equity_rsus=1500,
-        performance_rating=PerformanceRating.CONSISTENTLY_MEETS,
+        performance_rating=PerformanceRating.RATING_2,
         status=ReviewStatus.AUTO_APPROVED,
     )
     db.add(review)

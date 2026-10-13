@@ -35,10 +35,10 @@ class TestAgentOrchestrator(unittest.TestCase):
             current_base=Decimal("230000.00"),
             proposed_base=Decimal("250000.00"),  # Compa: 1.000
             proposed_bonus=Decimal("37500.00"),  # Exact 15% target
-            individual_perf_factor=Decimal("1.00"),
-            company_perf_factor=Decimal("1.00"),
+            individual_multiplier=Decimal("1.00"),
+            company_multiplier=Decimal("1.00"),
             proposed_equity_rsus=950,  # Target: 900
-            performance_rating=PerformanceRating.CONSISTENTLY_MEETS,
+            performance_rating=PerformanceRating.RATING_2,
         )
 
         self.assertEqual(audit.decision, ReviewStatus.AUTO_APPROVED.value)
@@ -56,17 +56,17 @@ class TestAgentOrchestrator(unittest.TestCase):
             current_base=Decimal("230000.00"),
             proposed_base=Decimal("250000.00"),
             proposed_bonus=Decimal("37500.00"),
-            individual_perf_factor=Decimal("1.00"),
-            company_perf_factor=Decimal("1.00"),
+            individual_multiplier=Decimal("1.00"),
+            company_multiplier=Decimal("1.00"),
             proposed_equity_rsus=2500,  # Far above 900 target
-            performance_rating=PerformanceRating.CONSISTENTLY_MEETS,
+            performance_rating=PerformanceRating.RATING_2,
         )
 
         self.assertEqual(audit.decision, ReviewStatus.VP_EXCEPTION_REQUIRED.value)
         self.assertIn("ESCALATED TO VP COMMITTEE", audit.rationale)
 
-    def test_employee_review_rejection_needs_improvement_raise(self) -> None:
-        """Verifies salary increase for Needs Improvement rating is REJECTED."""
+    def test_employee_review_rejection_rating_1_raise(self) -> None:
+        """Verifies salary increase for Rating 1 is REJECTED."""
         audit = self.review_agent.audit_review_proposal(
             review_id="REV-102",
             current_level=JobLevel.IC2,
@@ -76,10 +76,10 @@ class TestAgentOrchestrator(unittest.TestCase):
             current_base=Decimal("180000.00"),
             proposed_base=Decimal("195000.00"),
             proposed_bonus=Decimal("0.00"),
-            individual_perf_factor=Decimal("0.00"),
-            company_perf_factor=Decimal("1.00"),
+            individual_multiplier=Decimal("0.00"),
+            company_multiplier=Decimal("1.00"),
             proposed_equity_rsus=0,
-            performance_rating=PerformanceRating.NEEDS_IMPROVEMENT,
+            performance_rating=PerformanceRating.RATING_1,
         )
 
         self.assertEqual(audit.decision, ReviewStatus.REJECTED.value)

@@ -207,11 +207,11 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
             JobLevel.IC6,
         ]
         ratings_pool = [
-            PerformanceRating.CONSISTENTLY_MEETS,
-            PerformanceRating.CONSISTENTLY_MEETS,
-            PerformanceRating.EXCEEDS,
-            PerformanceRating.STRONGLY_OUTPERFORMS,
-            PerformanceRating.SUPERB,
+            PerformanceRating.RATING_2,
+            PerformanceRating.RATING_2,
+            PerformanceRating.RATING_3,
+            PerformanceRating.RATING_4,
+            PerformanceRating.RATING_5,
         ]
 
         created_employees: list[Employee] = []
@@ -269,7 +269,7 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
                 cycle_type="ANNUAL_TOTAL_REWARDS",
                 global_merit_budget_pct=Decimal("4.50"),
                 bonus_pool_funding_pct=Decimal("105.00"),
-                company_performance_factor=Decimal("1.10"),
+                company_multiplier=Decimal("1.10"),
                 status=CycleStatus.ACTIVE,
                 start_date=date(2026, 1, 15),
                 end_date=date(2026, 3, 31),
@@ -334,8 +334,8 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
                     proposed_compa_ratio=calculate_compa_ratio(proposed_base, b_rev.mid_base),
                     merit_increase_pct=raise_pct,
                     proposed_bonus_amount=bonus_amt,
-                    individual_perf_factor=Decimal("1.10"),
-                    company_perf_factor=cycle.company_performance_factor,
+                    individual_multiplier=Decimal("1.10"),
+                    company_multiplier=cycle.company_multiplier,
                     proposed_equity_rsus=equity_grant,
                     performance_rating=emp.last_performance_rating,
                     status=ReviewStatus.DRAFT,

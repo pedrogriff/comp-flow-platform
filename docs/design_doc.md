@@ -124,7 +124,7 @@ erDiagram
         string cycle_type
         decimal global_merit_budget_pct
         decimal bonus_pool_funding_pct
-        decimal company_performance_factor
+        decimal company_multiplier
         string status
         date start_date
         date end_date
@@ -151,8 +151,8 @@ erDiagram
         decimal proposed_base
         decimal merit_increase_pct
         decimal proposed_bonus_amount
-        decimal individual_perf_factor
-        decimal company_perf_factor
+        decimal individual_multiplier
+        decimal company_multiplier
         int proposed_equity_rsus
         string performance_rating
         string status
@@ -205,7 +205,7 @@ stateDiagram-v2
     SUBMITTED --> AGENT_AUDITING: Compliance Engine Execution
     AGENT_AUDITING --> AUTO_APPROVED: In-Band & Guideline Compliant
     AGENT_AUDITING --> VP_EXCEPTION_REQUIRED: Band/Bonus/Equity/Velocity Exception
-    AGENT_AUDITING --> REJECTED: Needs Improvement + Base Raise
+    AGENT_AUDITING --> REJECTED: Rating 1 + Base Raise
     VP_EXCEPTION_REQUIRED --> VP_APPROVED: Executive Sign-off
     VP_EXCEPTION_REQUIRED --> REJECTED: Executive Denial
     AUTO_APPROVED --> FINALIZED: HR Cycle Lock & Payroll Export

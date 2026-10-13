@@ -130,7 +130,7 @@ async def seeded_test_db(test_db_session: AsyncSession) -> dict[str, object]:
         department_id=dept.id,
         current_base=Decimal("230000.00"),
         current_equity_rsus=2700,
-        last_performance_rating=PerformanceRating.CONSISTENTLY_MEETS,
+        last_performance_rating=PerformanceRating.RATING_2,
         is_active=True,
     )
     db.add(emp)

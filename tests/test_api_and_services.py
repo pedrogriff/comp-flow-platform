@@ -155,7 +155,7 @@ async def test_compensation_cycle_full_lifecycle(
             "cycle_type": "ANNUAL_TOTAL_REWARDS",
             "global_merit_budget_pct": "4.50",
             "bonus_pool_funding_pct": "100.00",
-            "company_performance_factor": "1.00",
+            "company_multiplier": "1.00",
             "start_date": str(date.today()),
             "end_date": str(date.today() + timedelta(days=60)),
         },
@@ -182,9 +182,9 @@ async def test_compensation_cycle_full_lifecycle(
             "proposed_job_level": "IC3",
             "proposed_base": "245000.00",  # +6.5% raise
             "proposed_bonus_amount": "36750.00",  # 15% target
-            "individual_perf_factor": "1.00",
+            "individual_multiplier": "1.00",
             "proposed_equity_rsus": 900,
-            "performance_rating": "CONSISTENTLY_MEETS",
+            "performance_rating": "RATING_2",
             "justification_notes": "Great contributions to platform reliability.",
         },
     )
@@ -318,7 +318,7 @@ async def test_batch_audit_and_rbac_forbidden(
             "cycle_type": "ANNUAL_TOTAL_REWARDS",
             "global_merit_budget_pct": "5.00",
             "bonus_pool_funding_pct": "100.00",
-            "company_performance_factor": "1.00",
+            "company_multiplier": "1.00",
             "start_date": str(date.today()),
             "end_date": str(date.today() + timedelta(days=60)),
         },
@@ -335,9 +335,9 @@ async def test_batch_audit_and_rbac_forbidden(
             "proposed_job_level": "IC3",
             "proposed_base": "240000.00",
             "proposed_bonus_amount": "36000.00",
-            "individual_perf_factor": "1.00",
+            "individual_multiplier": "1.00",
             "proposed_equity_rsus": 900,
-            "performance_rating": "CONSISTENTLY_MEETS",
+            "performance_rating": "RATING_2",
             "justification_notes": "Test batch",
         },
     )

@@ -175,7 +175,7 @@ class Employee(Base):
     last_performance_rating: Mapped[PerformanceRating] = mapped_column(
         SQLEnum(PerformanceRating, name="perf_rating_enum", native_enum=False),
         nullable=False,
-        default=PerformanceRating.CONSISTENTLY_MEETS,
+        default=PerformanceRating.RATING_2,
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
@@ -213,7 +213,7 @@ class CompensationCycle(Base):
     bonus_pool_funding_pct: Mapped[Decimal] = mapped_column(
         Numeric(5, 2), nullable=False, default=Decimal("100.00")
     )
-    company_performance_factor: Mapped[Decimal] = mapped_column(
+    company_multiplier: Mapped[Decimal] = mapped_column(
         Numeric(4, 2), nullable=False, default=Decimal("1.00")
     )
     status: Mapped[CycleStatus] = mapped_column(
@@ -309,10 +309,10 @@ class EmployeeReview(Base):
     proposed_bonus_amount: Mapped[Decimal] = mapped_column(
         Numeric(12, 2), nullable=False, default=Decimal("0.00")
     )
-    individual_perf_factor: Mapped[Decimal] = mapped_column(
+    individual_multiplier: Mapped[Decimal] = mapped_column(
         Numeric(4, 2), nullable=False, default=Decimal("1.00")
     )
-    company_perf_factor: Mapped[Decimal] = mapped_column(
+    company_multiplier: Mapped[Decimal] = mapped_column(
         Numeric(4, 2), nullable=False, default=Decimal("1.00")
     )
     proposed_equity_rsus: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

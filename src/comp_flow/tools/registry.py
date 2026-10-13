@@ -16,11 +16,11 @@ from comp_flow.domain.models import (
 
 # Standard Multipliers for Equity Refreshes based on Performance Rating
 EQUITY_PERFORMANCE_MULTIPLIERS: dict[PerformanceRating, tuple[Decimal, Decimal]] = {
-    PerformanceRating.NEEDS_IMPROVEMENT: (Decimal("0.0"), Decimal("0.0")),
-    PerformanceRating.CONSISTENTLY_MEETS: (Decimal("0.80"), Decimal("1.20")),
-    PerformanceRating.EXCEEDS: (Decimal("1.10"), Decimal("1.45")),
-    PerformanceRating.STRONGLY_OUTPERFORMS: (Decimal("1.35"), Decimal("1.80")),
-    PerformanceRating.SUPERB: (Decimal("1.70"), Decimal("2.30")),
+    PerformanceRating.RATING_1: (Decimal("0.0"), Decimal("0.0")),
+    PerformanceRating.RATING_2: (Decimal("0.80"), Decimal("1.20")),
+    PerformanceRating.RATING_3: (Decimal("1.10"), Decimal("1.45")),
+    PerformanceRating.RATING_4: (Decimal("1.35"), Decimal("1.80")),
+    PerformanceRating.RATING_5: (Decimal("1.70"), Decimal("2.30")),
 }
 
 # Location Tier Cost of Labor Adjustment Factors
@@ -155,12 +155,12 @@ def verify_salary_band_compliance(
 def calculate_target_bonus_amount(
     proposed_base: Decimal,
     target_bonus_pct: Decimal,
-    individual_perf_factor: Decimal = Decimal("1.00"),
-    company_perf_factor: Decimal = Decimal("1.00"),
+    individual_multiplier: Decimal = Decimal("1.00"),
+    company_multiplier: Decimal = Decimal("1.00"),
 ) -> Decimal:
-    """Calculates standard annual bonus: Base * (Target% / 100) * IPF * CPF."""
+    """Calculates annual bonus: Base * (Target% / 100) * individual and company multipliers."""
     base_bonus = proposed_base * (target_bonus_pct / Decimal("100.0"))
-    final_bonus = base_bonus * individual_perf_factor * company_perf_factor
+    final_bonus = base_bonus * individual_multiplier * company_multiplier
     return final_bonus.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
@@ -168,12 +168,12 @@ def evaluate_bonus_compliance(
     proposed_bonus: Decimal,
     proposed_base: Decimal,
     target_bonus_pct: Decimal,
-    individual_perf_factor: Decimal,
-    company_perf_factor: Decimal,
+    individual_multiplier: Decimal,
+    company_multiplier: Decimal,
 ) -> AuditFinding:
     """Audits proposed bonus payout against the formula target."""
     target_amount = calculate_target_bonus_amount(
-        proposed_base, target_bonus_pct, individual_perf_factor, company_perf_factor
+        proposed_base, target_bonus_pct, individual_multiplier, company_multiplier
     )
     deviation = (
         abs(proposed_bonus - target_amount) / target_amount * Decimal("100.0")
@@ -188,7 +188,8 @@ def evaluate_bonus_compliance(
             details=(
                 f"Proposed bonus ${proposed_bonus:,.2f} deviates {deviation:.1f}% from "
                 f"formula target ${target_amount:,.2f} (Target: {target_bonus_pct}%, "
-                f"IPF: {individual_perf_factor}x, CPF: {company_perf_factor}x)"
+                f"individual multiplier: {individual_multiplier}x, "
+                f"company multiplier: {company_multiplier}x)"
             ),
             severity="WARNING",
         )
@@ -198,7 +199,8 @@ def evaluate_bonus_compliance(
         passed=True,
         details=(
             f"Proposed bonus ${proposed_bonus:,.2f} aligns with formula target "
-            f"${target_amount:,.2f} (IPF: {individual_perf_factor}x, CPF: {company_perf_factor}x)"
+            f"${target_amount:,.2f} (individual multiplier: {individual_multiplier}x, "
+            f"company multiplier: {company_multiplier}x)"
         ),
         severity="INFO",
     )
@@ -207,7 +209,7 @@ def evaluate_bonus_compliance(
 def evaluate_equity_guidelines(
     proposed_rsus: int = 0,
     band: SalaryBandBase = None,  # type: ignore[assignment]
-    rating: PerformanceRating = PerformanceRating.CONSISTENTLY_MEETS,
+    rating: PerformanceRating = PerformanceRating.RATING_2,
     **kwargs: Any,
 ) -> AuditFinding:
     """Evaluates proposed RSU equity grant against target guidelines adjusted for performance."""
@@ -269,7 +271,7 @@ def evaluate_base_increase_velocity(
 
     increase_pct = (proposed_base - current_base) / current_base * Decimal("100.0")
 
-    if rating == PerformanceRating.NEEDS_IMPROVEMENT and proposed_base > current_base:
+    if rating == PerformanceRating.RATING_1 and proposed_base > current_base:
         return AuditFinding(
             check_name="INCREASE_VELOCITY",
             passed=False,

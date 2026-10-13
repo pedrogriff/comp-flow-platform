@@ -75,22 +75,28 @@ class TestCompensationTools(unittest.TestCase):
         self.assertEqual(res_over.severity, "CRITICAL")
 
     def test_bonus_formula_and_compliance(self) -> None:
-        """Verifies target bonus formula: Base * Target% * IPF * CPF."""
+        """Verifies target bonus formula: Base * Target% * individual and company multipliers."""
         base = Decimal("200000.00")
         target_pct = Decimal("15.00")
-        ipf = Decimal("1.20")
-        cpf = Decimal("1.10")
+        individual_multiplier = Decimal("1.20")
+        company_multiplier = Decimal("1.10")
 
         # Target amount = 200,000 * 0.15 * 1.20 * 1.10 = $39,600.00
-        target = calculate_target_bonus_amount(base, target_pct, ipf, cpf)
+        target = calculate_target_bonus_amount(
+            base, target_pct, individual_multiplier, company_multiplier
+        )
         self.assertEqual(target, Decimal("39600.00"))
 
         # In-line proposed bonus
-        res_ok = evaluate_bonus_compliance(Decimal("40000.00"), base, target_pct, ipf, cpf)
+        res_ok = evaluate_bonus_compliance(
+            Decimal("40000.00"), base, target_pct, individual_multiplier, company_multiplier
+        )
         self.assertTrue(res_ok.passed)
 
         # Deviant proposed bonus (e.g. $60,000 > 25% deviation)
-        res_dev = evaluate_bonus_compliance(Decimal("60000.00"), base, target_pct, ipf, cpf)
+        res_dev = evaluate_bonus_compliance(
+            Decimal("60000.00"), base, target_pct, individual_multiplier, company_multiplier
+        )
         self.assertFalse(res_dev.passed)
         self.assertEqual(res_dev.severity, "WARNING")
 
@@ -101,39 +107,39 @@ class TestCompensationTools(unittest.TestCase):
         )
         # Target: 900 RSUs
 
-        # Exceeds rating (1.10 - 1.45x) -> [990, 1305] RSUs
-        res_ok = evaluate_equity_guidelines(1100, band, PerformanceRating.EXCEEDS)
+        # Rating 3 (1.10 - 1.45x) -> [990, 1305] RSUs
+        res_ok = evaluate_equity_guidelines(1100, band, PerformanceRating.RATING_3)
         self.assertTrue(res_ok.passed)
 
-        res_too_high = evaluate_equity_guidelines(1800, band, PerformanceRating.EXCEEDS)
+        res_too_high = evaluate_equity_guidelines(1800, band, PerformanceRating.RATING_3)
         self.assertFalse(res_too_high.passed)
         self.assertEqual(res_too_high.severity, "CRITICAL")
 
-        res_too_low = evaluate_equity_guidelines(500, band, PerformanceRating.EXCEEDS)
+        res_too_low = evaluate_equity_guidelines(500, band, PerformanceRating.RATING_3)
         self.assertFalse(res_too_low.passed)
         self.assertEqual(res_too_low.severity, "WARNING")
 
     def test_increase_velocity_cap(self) -> None:
-        """Verifies merit velocity caps and needs improvement restrictions."""
+        """Verifies merit velocity caps and Rating 1 restrictions."""
         current = Decimal("200000.00")
         proposed_ok = Decimal("220000.00")  # +10%
         proposed_high = Decimal("260000.00")  # +30%
 
-        res_ok = evaluate_base_increase_velocity(current, proposed_ok, PerformanceRating.EXCEEDS)
+        res_ok = evaluate_base_increase_velocity(current, proposed_ok, PerformanceRating.RATING_3)
         self.assertTrue(res_ok.passed)
 
         res_high = evaluate_base_increase_velocity(
-            current, proposed_high, PerformanceRating.EXCEEDS
+            current, proposed_high, PerformanceRating.RATING_3
         )
         self.assertFalse(res_high.passed)
         self.assertEqual(res_high.severity, "CRITICAL")
 
-        # Raise for Needs Improvement is rejected
-        res_ni = evaluate_base_increase_velocity(
-            current, proposed_ok, PerformanceRating.NEEDS_IMPROVEMENT
+        # Raise for Rating 1 is rejected
+        res_rating_1 = evaluate_base_increase_velocity(
+            current, proposed_ok, PerformanceRating.RATING_1
         )
-        self.assertFalse(res_ni.passed)
-        self.assertEqual(res_ni.severity, "CRITICAL")
+        self.assertFalse(res_rating_1.passed)
+        self.assertEqual(res_rating_1.severity, "CRITICAL")
 
     def test_promotion_compliance(self) -> None:
         """Verifies promotion step checks."""

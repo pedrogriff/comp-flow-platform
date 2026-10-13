@@ -9,7 +9,7 @@
 [![Kubernetes: Talos](https://img.shields.io/badge/Kubernetes-Talos%20Baremetal-blue.svg)](https://github.com/pedrogriff/homelab-k8s-talos)
 
 **CompFlow Platform** is a distributed, production-grade **Total Rewards Calibration & Offer Orchestration Microservice**. It combines deterministic policy auditing, dual-lifecycle state machines, and executive decision synthesis to govern:
-1. **Current Employee Annual Compensation Planning Cycles**: Salary Merit Increase matrices, Bonus allocations ($\text{Base} \times \text{Target\%} \times \text{IPF} \times \text{CPF}$), Equity Refresh grants, Promotion calibrations, and Departmental Budget Pool depletion.
+1. **Current Employee Annual Compensation Planning Cycles**: Salary Merit Increase matrices, Bonus allocations ($\text{Base} \times \text{Target\%} \times \text{individual multiplier} \times \text{company multiplier}$), Equity Refresh grants, Promotion calibrations, and Departmental Budget Pool depletion.
 2. **New Hire Candidate Offer Generation & Approvals**: Location-tiered salary band enforcement (`US_ZONE_1`, `US_ZONE_2`, `US_ZONE_3`), sign-on bonus caps ($50,000 threshold), new hire equity caps, and multi-tier approval routing.
 3. **Cloud-Native GitOps & Observability**: PostgreSQL 16 schema with Alembic async migrations, Redis 7 caching & atomic counters, Ingress-NGINX with cert-manager TLS, Prometheus metrics `/metrics`, and ArgoCD GitOps deployment on a bare-metal Talos Kubernetes homelab.
 

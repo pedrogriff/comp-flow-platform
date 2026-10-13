@@ -41,13 +41,13 @@ class LocationTier(StrEnum):
 
 
 class PerformanceRating(StrEnum):
-    """Performance evaluation ratings."""
+    """Performance ratings from RATING_1, the lowest, to RATING_5, the highest."""
 
-    NEEDS_IMPROVEMENT = "NEEDS_IMPROVEMENT"
-    CONSISTENTLY_MEETS = "CONSISTENTLY_MEETS"
-    EXCEEDS = "EXCEEDS"
-    STRONGLY_OUTPERFORMS = "STRONGLY_OUTPERFORMS"
-    SUPERB = "SUPERB"
+    RATING_1 = "RATING_1"
+    RATING_2 = "RATING_2"
+    RATING_3 = "RATING_3"
+    RATING_4 = "RATING_4"
+    RATING_5 = "RATING_5"
 
 
 class ReviewStatus(StrEnum):
@@ -230,7 +230,7 @@ class EmployeeBase(BaseModel):
         ge=0,
         validation_alias=AliasChoices("current_equity_rsus", "current_equity_gsus"),
     )
-    last_performance_rating: PerformanceRating = PerformanceRating.CONSISTENTLY_MEETS
+    last_performance_rating: PerformanceRating = PerformanceRating.RATING_2
 
     @property
     def current_equity_gsus(self) -> int:
@@ -258,7 +258,7 @@ class CompensationCycleBase(BaseModel):
     cycle_type: str = "ANNUAL_TOTAL_REWARDS"
     global_merit_budget_pct: Decimal = Field(default=Decimal("4.00"), ge=0, le=20)
     bonus_pool_funding_pct: Decimal = Field(default=Decimal("100.00"), ge=0, le=200)
-    company_performance_factor: Decimal = Field(default=Decimal("1.00"), ge=0, le=2.0)
+    company_multiplier: Decimal = Field(default=Decimal("1.00"), ge=0, le=2.0)
     start_date: date
     end_date: date
 
@@ -309,7 +309,7 @@ class EmployeeReviewProposalBase(BaseModel):
     proposed_job_level: JobLevel
     proposed_base: Decimal = Field(gt=0)
     proposed_bonus_amount: Decimal = Field(default=Decimal("0.00"), ge=0)
-    individual_perf_factor: Decimal = Field(default=Decimal("1.00"), ge=0, le=2.5)
+    individual_multiplier: Decimal = Field(default=Decimal("1.00"), ge=0, le=2.5)
     proposed_equity_rsus: int = Field(
         default=0,
         ge=0,
@@ -331,7 +331,7 @@ class EmployeeReviewProposalUpdate(BaseModel):
     proposed_job_level: JobLevel | None = None
     proposed_base: Decimal | None = None
     proposed_bonus_amount: Decimal | None = None
-    individual_perf_factor: Decimal | None = None
+    individual_multiplier: Decimal | None = None
     proposed_equity_rsus: int | None = Field(
         default=None,
         validation_alias=AliasChoices("proposed_equity_rsus", "proposed_equity_gsus"),
