@@ -195,16 +195,16 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
 
         dept_list = list(created_depts.values())
         levels_pool = [
-            JobLevel.L3,
-            JobLevel.L4,
-            JobLevel.L4,
-            JobLevel.L5,
-            JobLevel.L5,
-            JobLevel.L5,
-            JobLevel.L6,
-            JobLevel.L6,
-            JobLevel.L7,
-            JobLevel.L8,
+            JobLevel.IC1,
+            JobLevel.IC2,
+            JobLevel.IC2,
+            JobLevel.IC3,
+            JobLevel.IC3,
+            JobLevel.IC3,
+            JobLevel.IC4,
+            JobLevel.IC4,
+            JobLevel.IC5,
+            JobLevel.IC6,
         ]
         ratings_pool = [
             PerformanceRating.CONSISTENTLY_MEETS,
@@ -360,7 +360,7 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
             (
                 "Cassandra Vance",
                 "cassandra.vance@gmail.com",
-                JobLevel.L5,
+                JobLevel.IC3,
                 LocationTier.US_ZONE_1,
                 Decimal("245000.00"),
                 Decimal("25000.00"),
@@ -369,7 +369,7 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
             (
                 "Marcus Sterling",
                 "m.sterling99@yahoo.com",
-                JobLevel.L6,
+                JobLevel.IC4,
                 LocationTier.US_ZONE_1,
                 Decimal("320000.00"),
                 Decimal("65000.00"),
@@ -378,7 +378,7 @@ async def seed_enterprise_data(session: AsyncSession | None = None) -> None:
             (
                 "Lillian Chen",
                 "lillian.chen@mit.edu",
-                JobLevel.L4,
+                JobLevel.IC2,
                 LocationTier.US_ZONE_2,
                 Decimal("185000.00"),
                 Decimal("15000.00"),

@@ -118,7 +118,7 @@ async def test_salary_bands_endpoints(
         "/api/v1/bands",
         headers={"Authorization": f"Bearer {admin_token}"},
         json={
-            "job_level": "L6",
+            "job_level": "IC4",
             "job_family": "SOFTWARE_ENGINEERING",
             "location_tier": "US_ZONE_1",
             "min_base": "260000.00",
@@ -129,7 +129,7 @@ async def test_salary_bands_endpoints(
         },
     )
     assert res_create.status_code == 200
-    assert res_create.json()["job_level"] == "L6"
+    assert res_create.json()["job_level"] == "IC4"
 
 
 @pytest.mark.asyncio
@@ -179,7 +179,7 @@ async def test_compensation_cycle_full_lifecycle(
         json={
             "cycle_id": cycle_id,
             "employee_id": str(emp.id),
-            "proposed_job_level": "L5",
+            "proposed_job_level": "IC3",
             "proposed_base": "245000.00",  # +6.5% raise
             "proposed_bonus_amount": "36750.00",  # 15% target
             "individual_perf_factor": "1.00",
@@ -236,7 +236,7 @@ async def test_candidate_offer_full_lifecycle(
         json={
             "candidate_name": "Devin AI",
             "candidate_email": "devin@candidate.test",
-            "job_level": "L5",
+            "job_level": "IC3",
             "job_family": "SOFTWARE_ENGINEERING",
             "location_tier": "US_ZONE_1",
             "department_id": str(dept.id),
@@ -332,7 +332,7 @@ async def test_batch_audit_and_rbac_forbidden(
         json={
             "cycle_id": cycle_id,
             "employee_id": str(emp.id),
-            "proposed_job_level": "L5",
+            "proposed_job_level": "IC3",
             "proposed_base": "240000.00",
             "proposed_bonus_amount": "36000.00",
             "individual_perf_factor": "1.00",

@@ -25,12 +25,12 @@ class BenchmarkSourceType(StrEnum):
 class RadfordLevel(StrEnum):
     """Radford-style standardized job levels."""
 
-    P1 = "P1"  # Entry / Associate (L3)
-    P2 = "P2"  # Developing / Intermediate (L4)
-    P3 = "P3"  # Career / Senior (L5)
-    P4 = "P4"  # Advanced / Staff (L6)
-    P5 = "P5"  # Expert / Senior Staff / Principal (L7)
-    P6 = "P6"  # Principal / Fellow / Distinguished (L8)
+    P1 = "P1"  # Entry / Associate (IC1)
+    P2 = "P2"  # Developing / Intermediate (IC2)
+    P3 = "P3"  # Career / Senior (IC3)
+    P4 = "P4"  # Advanced / Staff (IC4)
+    P5 = "P5"  # Expert / Senior Staff / Principal (IC5)
+    P6 = "P6"  # Principal / Fellow / Distinguished (IC6)
     M1 = "M1"  # Team Lead / Supervisor
     M2 = "M2"  # Manager
     M3 = "M3"  # Senior Manager

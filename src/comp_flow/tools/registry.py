@@ -32,42 +32,42 @@ GEO_FACTORS: dict[LocationTier, Decimal] = {
 
 # Standard Base Salary Benchmarks for Zone 1 Software Engineering
 DEFAULT_ZONE_1_BENCHMARKS: dict[JobLevel, tuple[Decimal, Decimal, Decimal, int, Decimal]] = {
-    JobLevel.L3: (
+    JobLevel.IC1: (
         Decimal("140000.00"),
         Decimal("165000.00"),
         Decimal("190000.00"),
         400,
         Decimal("10.00"),
     ),
-    JobLevel.L4: (
+    JobLevel.IC2: (
         Decimal("170000.00"),
         Decimal("200000.00"),
         Decimal("230000.00"),
         650,
         Decimal("15.00"),
     ),
-    JobLevel.L5: (
+    JobLevel.IC3: (
         Decimal("210000.00"),
         Decimal("250000.00"),
         Decimal("290000.00"),
         900,
         Decimal("15.00"),
     ),
-    JobLevel.L6: (
+    JobLevel.IC4: (
         Decimal("260000.00"),
         Decimal("310000.00"),
         Decimal("360000.00"),
         1400,
         Decimal("20.00"),
     ),
-    JobLevel.L7: (
+    JobLevel.IC5: (
         Decimal("320000.00"),
         Decimal("380000.00"),
         Decimal("440000.00"),
         2200,
         Decimal("25.00"),
     ),
-    JobLevel.L8: (
+    JobLevel.IC6: (
         Decimal("400000.00"),
         Decimal("480000.00"),
         Decimal("560000.00"),

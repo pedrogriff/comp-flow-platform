@@ -58,7 +58,7 @@ async def list_market_benchmarks(
 @router.get("/lookup", response_model=MarketBenchmark)
 async def get_market_benchmark(
     job_family: JobFamily = Query(..., description="Job Family (e.g. SOFTWARE_ENGINEERING)"),
-    job_level: JobLevel = Query(..., description="Job Level (e.g. L5)"),
+    job_level: JobLevel = Query(..., description="Job Level (e.g. IC3)"),
     geo_tier: LocationTier = Query(LocationTier.US_ZONE_1, description="Location Tier"),
     source_type: BenchmarkSourceType | None = Query(None, description="Optional data source"),
     db: AsyncSession = Depends(get_db),

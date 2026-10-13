@@ -33,12 +33,12 @@ class BenchmarkNormalizer:
 
     # Radford to Internal Level Bi-directional Mapping
     RADFORD_LEVEL_MAP: dict[JobLevel, RadfordLevel] = {
-        JobLevel.L3: RadfordLevel.P1,
-        JobLevel.L4: RadfordLevel.P2,
-        JobLevel.L5: RadfordLevel.P3,
-        JobLevel.L6: RadfordLevel.P4,
-        JobLevel.L7: RadfordLevel.P5,
-        JobLevel.L8: RadfordLevel.P6,
+        JobLevel.IC1: RadfordLevel.P1,
+        JobLevel.IC2: RadfordLevel.P2,
+        JobLevel.IC3: RadfordLevel.P3,
+        JobLevel.IC4: RadfordLevel.P4,
+        JobLevel.IC5: RadfordLevel.P5,
+        JobLevel.IC6: RadfordLevel.P6,
     }
 
     # Metro / City to Geo Tier Mapping
@@ -160,31 +160,31 @@ class BenchmarkNormalizer:
             family = JobFamily.SYSTEMS_INFRASTRUCTURE
 
         # 2. Infer Job Level
-        level = JobLevel.L5  # Default baseline is Senior / Proficient
+        level = JobLevel.IC3  # Default baseline is Senior / Proficient
         if any(
-            w in clean_title for w in ["PRINCIPAL", "DISTINGUISHED", "FELLOW", "DIRECTOR", "L8"]
+            w in clean_title for w in ["PRINCIPAL", "DISTINGUISHED", "FELLOW", "DIRECTOR", "IC6"]
         ):
-            level = JobLevel.L8
+            level = JobLevel.IC6
         elif any(
             w in clean_title
-            for w in ["SR. STAFF", "SENIOR STAFF", "STAFF ARCHITECT", "PRINCIPAL ARCHITECT", "L7"]
+            for w in ["SR. STAFF", "SENIOR STAFF", "STAFF ARCHITECT", "PRINCIPAL ARCHITECT", "IC5"]
         ):
-            level = JobLevel.L7
-        elif any(w in clean_title for w in ["STAFF", "LEAD", "ARCHITECT", "L6"]):
-            level = JobLevel.L6
-        elif any(w in clean_title for w in ["SENIOR", "SR.", "SR ", "III", "L5"]):
-            level = JobLevel.L5
-        elif any(w in clean_title for w in ["MID", "II", "INTERMEDIATE", "L4"]):
-            level = JobLevel.L4
+            level = JobLevel.IC5
+        elif any(w in clean_title for w in ["STAFF", "LEAD", "ARCHITECT", "IC4"]):
+            level = JobLevel.IC4
+        elif any(w in clean_title for w in ["SENIOR", "SR.", "SR ", "III", "IC3"]):
+            level = JobLevel.IC3
+        elif any(w in clean_title for w in ["MID", "II", "INTERMEDIATE", "IC2"]):
+            level = JobLevel.IC2
         elif any(
-            w in clean_title for w in ["JUNIOR", "JR.", "JR ", "ASSOCIATE", "ENTRY", "I", "L3"]
+            w in clean_title for w in ["JUNIOR", "JR.", "JR ", "ASSOCIATE", "ENTRY", "I", "IC1"]
         ):
-            level = JobLevel.L3
+            level = JobLevel.IC1
 
-        # Match specific level regex e.g. "SWE L6" or "Software Engineer 4"
-        lvl_match = re.search(r"\bL([3-8])\b", clean_title)
+        # Match specific level regex e.g. "SWE IC4" or "Software Engineer 4"
+        lvl_match = re.search(r"\bIC([1-6])\b", clean_title)
         if lvl_match:
-            level = JobLevel(f"L{lvl_match.group(1)}")
+            level = JobLevel(f"IC{lvl_match.group(1)}")
 
         radford = cls.RADFORD_LEVEL_MAP.get(level, RadfordLevel.P3)
         soc = soc_code or cls.SOC_MAPPINGS.get(family, "15-1252.00")

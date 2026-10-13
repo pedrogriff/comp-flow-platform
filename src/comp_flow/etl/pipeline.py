@@ -83,17 +83,19 @@ class BenchmarkETLPipeline:
             )
 
             radford = BenchmarkNormalizer.RADFORD_LEVEL_MAP.get(
-                level, BenchmarkNormalizer.RADFORD_LEVEL_MAP[JobLevel.L5]
+                level, BenchmarkNormalizer.RADFORD_LEVEL_MAP[JobLevel.IC3]
             )
             soc = BenchmarkNormalizer.SOC_MAPPINGS.get(family, "15-1252.00")
 
             # Default bonus & equity guideline targets based on level
             target_bonus = (
                 Decimal("10.00")
-                if level == JobLevel.L3
-                else (Decimal("15.00") if level in (JobLevel.L4, JobLevel.L5) else Decimal("20.00"))
+                if level == JobLevel.IC1
+                else (
+                    Decimal("15.00") if level in (JobLevel.IC2, JobLevel.IC3) else Decimal("20.00")
+                )
             )
-            p50_eq = 400 if level == JobLevel.L3 else (900 if level == JobLevel.L5 else 1400)
+            p50_eq = 400 if level == JobLevel.IC1 else (900 if level == JobLevel.IC3 else 1400)
 
             bench = MarketBenchmark(
                 soc_code=soc,
@@ -185,16 +187,18 @@ class BenchmarkETLPipeline:
             )
 
             radford = BenchmarkNormalizer.RADFORD_LEVEL_MAP.get(
-                level, BenchmarkNormalizer.RADFORD_LEVEL_MAP[JobLevel.L5]
+                level, BenchmarkNormalizer.RADFORD_LEVEL_MAP[JobLevel.IC3]
             )
             soc = BenchmarkNormalizer.SOC_MAPPINGS.get(family, "15-1252.00")
 
             target_bonus = (
                 Decimal("10.00")
-                if level == JobLevel.L3
-                else (Decimal("15.00") if level in (JobLevel.L4, JobLevel.L5) else Decimal("20.00"))
+                if level == JobLevel.IC1
+                else (
+                    Decimal("15.00") if level in (JobLevel.IC2, JobLevel.IC3) else Decimal("20.00")
+                )
             )
-            p50_eq = 400 if level == JobLevel.L3 else (900 if level == JobLevel.L5 else 1400)
+            p50_eq = 400 if level == JobLevel.IC1 else (900 if level == JobLevel.IC3 else 1400)
 
             bench = MarketBenchmark(
                 soc_code=soc,

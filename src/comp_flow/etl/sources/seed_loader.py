@@ -18,7 +18,7 @@ class BenchmarkSeedLoader:
     # Baseline Zone 1 (SF Bay Area / NYC) P50 Base Salaried Ranges (2026 Tech Market)
     BASELINE_ZONE_1: dict[tuple[JobFamily, JobLevel], dict[str, Any]] = {
         # Software Engineering
-        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.L3): {
+        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.IC1): {
             "p10": 135000,
             "p25": 150000,
             "p50": 165000,
@@ -29,7 +29,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 600,
             "sample_size": 420,
         },
-        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.L4): {
+        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.IC2): {
             "p10": 165000,
             "p25": 185000,
             "p50": 205000,
@@ -40,7 +40,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 950,
             "sample_size": 680,
         },
-        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.L5): {
+        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.IC3): {
             "p10": 205000,
             "p25": 230000,
             "p50": 255000,
@@ -51,7 +51,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 1350,
             "sample_size": 940,
         },
-        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.L6): {
+        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.IC4): {
             "p10": 255000,
             "p25": 285000,
             "p50": 315000,
@@ -62,7 +62,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 2100,
             "sample_size": 510,
         },
-        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.L7): {
+        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.IC5): {
             "p10": 315000,
             "p25": 355000,
             "p50": 395000,
@@ -73,7 +73,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 3300,
             "sample_size": 260,
         },
-        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.L8): {
+        (JobFamily.SOFTWARE_ENGINEERING, JobLevel.IC6): {
             "p10": 395000,
             "p25": 445000,
             "p50": 500000,
@@ -85,7 +85,7 @@ class BenchmarkSeedLoader:
             "sample_size": 110,
         },
         # Systems & Infrastructure Engineering (+5% premium)
-        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.L3): {
+        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.IC1): {
             "p10": 140000,
             "p25": 155000,
             "p50": 172000,
@@ -96,7 +96,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 630,
             "sample_size": 310,
         },
-        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.L4): {
+        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.IC2): {
             "p10": 172000,
             "p25": 192000,
             "p50": 215000,
@@ -107,7 +107,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 1000,
             "sample_size": 480,
         },
-        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.L5): {
+        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.IC3): {
             "p10": 215000,
             "p25": 240000,
             "p50": 268000,
@@ -118,7 +118,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 1400,
             "sample_size": 650,
         },
-        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.L6): {
+        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.IC4): {
             "p10": 268000,
             "p25": 298000,
             "p50": 330000,
@@ -129,7 +129,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 2250,
             "sample_size": 390,
         },
-        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.L7): {
+        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.IC5): {
             "p10": 330000,
             "p25": 370000,
             "p50": 415000,
@@ -140,7 +140,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 3600,
             "sample_size": 180,
         },
-        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.L8): {
+        (JobFamily.SYSTEMS_INFRASTRUCTURE, JobLevel.IC6): {
             "p10": 415000,
             "p25": 465000,
             "p50": 525000,
@@ -152,7 +152,7 @@ class BenchmarkSeedLoader:
             "sample_size": 75,
         },
         # Machine Learning / AI Platform (+10% premium)
-        (JobFamily.MACHINE_LEARNING, JobLevel.L3): {
+        (JobFamily.MACHINE_LEARNING, JobLevel.IC1): {
             "p10": 145000,
             "p25": 162000,
             "p50": 180000,
@@ -163,7 +163,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 750,
             "sample_size": 280,
         },
-        (JobFamily.MACHINE_LEARNING, JobLevel.L4): {
+        (JobFamily.MACHINE_LEARNING, JobLevel.IC2): {
             "p10": 180000,
             "p25": 202000,
             "p50": 226000,
@@ -174,7 +174,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 1200,
             "sample_size": 420,
         },
-        (JobFamily.MACHINE_LEARNING, JobLevel.L5): {
+        (JobFamily.MACHINE_LEARNING, JobLevel.IC3): {
             "p10": 225000,
             "p25": 252000,
             "p50": 280000,
@@ -185,7 +185,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 1650,
             "sample_size": 590,
         },
-        (JobFamily.MACHINE_LEARNING, JobLevel.L6): {
+        (JobFamily.MACHINE_LEARNING, JobLevel.IC4): {
             "p10": 280000,
             "p25": 315000,
             "p50": 350000,
@@ -196,7 +196,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 2600,
             "sample_size": 330,
         },
-        (JobFamily.MACHINE_LEARNING, JobLevel.L7): {
+        (JobFamily.MACHINE_LEARNING, JobLevel.IC5): {
             "p10": 350000,
             "p25": 395000,
             "p50": 445000,
@@ -207,7 +207,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 4050,
             "sample_size": 150,
         },
-        (JobFamily.MACHINE_LEARNING, JobLevel.L8): {
+        (JobFamily.MACHINE_LEARNING, JobLevel.IC6): {
             "p10": 445000,
             "p25": 500000,
             "p50": 565000,
@@ -219,7 +219,7 @@ class BenchmarkSeedLoader:
             "sample_size": 60,
         },
         # Data Science
-        (JobFamily.DATA_SCIENCE, JobLevel.L3): {
+        (JobFamily.DATA_SCIENCE, JobLevel.IC1): {
             "p10": 130000,
             "p25": 145000,
             "p50": 160000,
@@ -230,7 +230,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 570,
             "sample_size": 240,
         },
-        (JobFamily.DATA_SCIENCE, JobLevel.L4): {
+        (JobFamily.DATA_SCIENCE, JobLevel.IC2): {
             "p10": 160000,
             "p25": 180000,
             "p50": 200000,
@@ -241,7 +241,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 900,
             "sample_size": 390,
         },
-        (JobFamily.DATA_SCIENCE, JobLevel.L5): {
+        (JobFamily.DATA_SCIENCE, JobLevel.IC3): {
             "p10": 200000,
             "p25": 225000,
             "p50": 250000,
@@ -252,7 +252,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 1250,
             "sample_size": 470,
         },
-        (JobFamily.DATA_SCIENCE, JobLevel.L6): {
+        (JobFamily.DATA_SCIENCE, JobLevel.IC4): {
             "p10": 250000,
             "p25": 280000,
             "p50": 310000,
@@ -263,7 +263,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 2000,
             "sample_size": 280,
         },
-        (JobFamily.DATA_SCIENCE, JobLevel.L7): {
+        (JobFamily.DATA_SCIENCE, JobLevel.IC5): {
             "p10": 310000,
             "p25": 350000,
             "p50": 390000,
@@ -274,7 +274,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 3150,
             "sample_size": 130,
         },
-        (JobFamily.DATA_SCIENCE, JobLevel.L8): {
+        (JobFamily.DATA_SCIENCE, JobLevel.IC6): {
             "p10": 390000,
             "p25": 440000,
             "p50": 490000,
@@ -286,7 +286,7 @@ class BenchmarkSeedLoader:
             "sample_size": 50,
         },
         # Product Management
-        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.L3): {
+        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.IC1): {
             "p10": 135000,
             "p25": 150000,
             "p50": 165000,
@@ -297,7 +297,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 525,
             "sample_size": 190,
         },
-        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.L4): {
+        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.IC2): {
             "p10": 165000,
             "p25": 185000,
             "p50": 205000,
@@ -308,7 +308,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 825,
             "sample_size": 310,
         },
-        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.L5): {
+        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.IC3): {
             "p10": 205000,
             "p25": 230000,
             "p50": 255000,
@@ -319,7 +319,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 1200,
             "sample_size": 420,
         },
-        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.L6): {
+        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.IC4): {
             "p10": 255000,
             "p25": 285000,
             "p50": 315000,
@@ -330,7 +330,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 1875,
             "sample_size": 250,
         },
-        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.L7): {
+        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.IC5): {
             "p10": 315000,
             "p25": 355000,
             "p50": 395000,
@@ -341,7 +341,7 @@ class BenchmarkSeedLoader:
             "p75_equity": 2925,
             "sample_size": 120,
         },
-        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.L8): {
+        (JobFamily.PRODUCT_MANAGEMENT, JobLevel.IC6): {
             "p10": 395000,
             "p25": 445000,
             "p50": 500000,

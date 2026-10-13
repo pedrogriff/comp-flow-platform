@@ -60,7 +60,7 @@ async def test_tse_triage_compliant_review(
         id=uuid.uuid4(),
         cycle_id=cycle.id,
         employee_id=emp.id,
-        proposed_job_level=JobLevel.L5,
+        proposed_job_level=JobLevel.IC3,
         current_base=Decimal("230000.00"),
         proposed_base=Decimal("250000.00"),
         proposed_bonus_amount=Decimal("37500.00"),
@@ -126,12 +126,12 @@ async def test_tse_triage_out_of_band_ceiling(
     db.add(cycle)
     await db.flush()
 
-    # L5 max is $290k. Propose $350k (way above max ceiling)
+    # IC3 max is $290k. Propose $350k (way above max ceiling)
     review = EmployeeReview(
         id=uuid.uuid4(),
         cycle_id=cycle.id,
         employee_id=emp.id,
-        proposed_job_level=JobLevel.L5,
+        proposed_job_level=JobLevel.IC3,
         current_base=Decimal("230000.00"),
         proposed_base=Decimal("350000.00"),
         proposed_bonus_amount=Decimal("52500.00"),
@@ -195,7 +195,7 @@ async def test_tse_trace_id_correlation(
         id=uuid.uuid4(),
         cycle_id=cycle.id,
         employee_id=emp.id,
-        proposed_job_level=JobLevel.L5,
+        proposed_job_level=JobLevel.IC3,
         current_base=Decimal("170000.00"),
         proposed_base=Decimal("185000.00"),
         proposed_bonus_amount=Decimal("27750.00"),

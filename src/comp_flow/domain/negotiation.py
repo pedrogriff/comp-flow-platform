@@ -78,7 +78,7 @@ class OurOfferInput(BaseModel):
         default=VestingScheduleType.ENTERPRISE_FRONT_LOADED_33_33_22_12,
         description="Our company's vesting schedule",
     )
-    job_level: JobLevel = Field(default=JobLevel.L5, description="Candidate job level")
+    job_level: JobLevel = Field(default=JobLevel.IC3, description="Candidate job level")
     job_family: JobFamily = Field(
         default=JobFamily.SOFTWARE_ENGINEERING, description="Candidate job family"
     )

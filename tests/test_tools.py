@@ -40,13 +40,13 @@ class TestCompensationTools(unittest.TestCase):
     def test_geo_adjusted_salary_bands(self) -> None:
         """Verifies geographic tier discounts for salary bands."""
         zone_1 = get_default_salary_band(
-            JobLevel.L5, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
+            JobLevel.IC3, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
         )
         zone_2 = get_default_salary_band(
-            JobLevel.L5, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_2
+            JobLevel.IC3, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_2
         )
         zone_3 = get_default_salary_band(
-            JobLevel.L5, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_3
+            JobLevel.IC3, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_3
         )
 
         self.assertEqual(zone_1.mid_base, Decimal("250000.00"))
@@ -56,9 +56,9 @@ class TestCompensationTools(unittest.TestCase):
     def test_salary_band_compliance(self) -> None:
         """Verifies boundary checks on salary bands."""
         band = get_default_salary_band(
-            JobLevel.L4, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
+            JobLevel.IC2, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
         )
-        # L4 Zone 1: [170k, 230k]
+        # IC2 Zone 1: [170k, 230k]
 
         # Valid in-band
         res_valid = verify_salary_band_compliance(Decimal("200000.00"), band)
@@ -97,7 +97,7 @@ class TestCompensationTools(unittest.TestCase):
     def test_equity_guidelines(self) -> None:
         """Verifies performance rating multiplier ranges."""
         band = get_default_salary_band(
-            JobLevel.L5, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
+            JobLevel.IC3, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
         )
         # Target: 900 RSUs
 
@@ -137,35 +137,35 @@ class TestCompensationTools(unittest.TestCase):
 
     def test_promotion_compliance(self) -> None:
         """Verifies promotion step checks."""
-        l5_band = get_default_salary_band(
-            JobLevel.L5, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
+        ic3_band = get_default_salary_band(
+            JobLevel.IC3, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
         )
 
-        # Valid promotion L4 -> L5 with salary >= min L5 ($210k)
+        # Valid promotion IC2 -> IC3 with salary >= min IC3 ($210k)
         res_valid = evaluate_promotion_compliance(
-            JobLevel.L4, JobLevel.L5, Decimal("220000.00"), l5_band
+            JobLevel.IC2, JobLevel.IC3, Decimal("220000.00"), ic3_band
         )
         self.assertTrue(res_valid.passed)
 
-        # Multi-level jump L4 -> L6
-        l6_band = get_default_salary_band(
-            JobLevel.L6, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
+        # Multi-level jump IC2 -> IC4
+        ic4_band = get_default_salary_band(
+            JobLevel.IC4, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
         )
         res_jump = evaluate_promotion_compliance(
-            JobLevel.L4, JobLevel.L6, Decimal("270000.00"), l6_band
+            JobLevel.IC2, JobLevel.IC4, Decimal("270000.00"), ic4_band
         )
         self.assertFalse(res_jump.passed)
 
         # Promotion with below min base
         res_below = evaluate_promotion_compliance(
-            JobLevel.L4, JobLevel.L5, Decimal("190000.00"), l5_band
+            JobLevel.IC2, JobLevel.IC3, Decimal("190000.00"), ic3_band
         )
         self.assertFalse(res_below.passed)
 
     def test_candidate_offer_compliance_and_totals(self) -> None:
         """Verifies candidate offer sign-on and equity caps, plus total comp calculations."""
         band = get_default_salary_band(
-            JobLevel.L5, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
+            JobLevel.IC3, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
         )
         # Target equity: 900 RSUs, max new hire (1.5x) = 1350
 

@@ -100,20 +100,20 @@ async def seeded_test_db(test_db_session: AsyncSession) -> dict[str, object]:
     )
     db.add(dept)
 
-    # Salary Band (L5 SWE Zone 1)
-    b_l5 = get_default_salary_band(
-        JobLevel.L5, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
+    # Salary Band (IC3 SWE Zone 1)
+    b_ic3 = get_default_salary_band(
+        JobLevel.IC3, JobFamily.SOFTWARE_ENGINEERING, LocationTier.US_ZONE_1
     )
     band = SalaryBand(
         id=uuid.uuid4(),
-        job_level=b_l5.job_level,
-        job_family=b_l5.job_family,
-        location_tier=b_l5.location_tier,
-        min_base=b_l5.min_base,
-        mid_base=b_l5.mid_base,
-        max_base=b_l5.max_base,
-        target_equity_rsus=b_l5.target_equity_rsus,
-        target_bonus_pct=b_l5.target_bonus_pct,
+        job_level=b_ic3.job_level,
+        job_family=b_ic3.job_family,
+        location_tier=b_ic3.location_tier,
+        min_base=b_ic3.min_base,
+        mid_base=b_ic3.mid_base,
+        max_base=b_ic3.max_base,
+        target_equity_rsus=b_ic3.target_equity_rsus,
+        target_bonus_pct=b_ic3.target_bonus_pct,
     )
     db.add(band)
 
@@ -124,7 +124,7 @@ async def seeded_test_db(test_db_session: AsyncSession) -> dict[str, object]:
         first_name="Jane",
         last_name="Doe",
         email="jane.doe@test.com",
-        job_level=JobLevel.L5,
+        job_level=JobLevel.IC3,
         job_family=JobFamily.SOFTWARE_ENGINEERING,
         location_tier=LocationTier.US_ZONE_1,
         department_id=dept.id,

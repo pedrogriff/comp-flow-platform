@@ -22,7 +22,7 @@ class TestWorkflowEngine(unittest.TestCase):
         proposal = InMemProposal(
             review_id="REV-200",
             employee_id="EMP-200",
-            job_level=JobLevel.L6,
+            job_level=JobLevel.IC4,
             current_base=Decimal("280000.00"),
             proposed_base=Decimal("300000.00"),
             proposed_equity_rsus=1600,  # Target: 1400
@@ -46,7 +46,7 @@ class TestWorkflowEngine(unittest.TestCase):
         proposal = InMemProposal(
             review_id="REV-201",
             employee_id="EMP-201",
-            job_level=JobLevel.L5,
+            job_level=JobLevel.IC3,
             current_base=Decimal("220000.00"),
             proposed_base=Decimal("295000.00"),  # Exceeds max ($290k)
             proposed_equity_rsus=900,

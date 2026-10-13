@@ -105,11 +105,11 @@ class BenchmarkStatisticalEngine:
     def smooth_level_monotonicity(
         cls, level_percentiles: dict[str, BenchmarkPercentiles]
     ) -> dict[str, BenchmarkPercentiles]:
-        """Ensures monotonic progression across seniority levels (L3 -> L8).
+        """Ensures monotonic progression across seniority levels (IC1 -> IC6).
 
         Guarantees that senior levels are never priced lower than junior levels due to small cohort sampling.
         """
-        ordered_levels = ["L3", "L4", "L5", "L6", "L7", "L8"]
+        ordered_levels = ["IC1", "IC2", "IC3", "IC4", "IC5", "IC6"]
         smoothed: dict[str, BenchmarkPercentiles] = {}
         prev_p50 = Decimal("0.00")
 

@@ -26,7 +26,7 @@ def test_simulate_counter_offer_front_loaded_advantage():
         equity_rsus_4yr=1600,
         share_price_estimate=Decimal("100.00"),  # $160k equity total ($52.8k Yr 1)
         vesting_schedule=VestingScheduleType.ENTERPRISE_FRONT_LOADED_33_33_22_12,
-        job_level=JobLevel.L5,
+        job_level=JobLevel.IC3,
         job_family=JobFamily.SOFTWARE_ENGINEERING,
         location_tier=LocationTier.US_ZONE_1,
     )

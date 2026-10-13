@@ -59,25 +59,25 @@ def test_role_classification_and_radford_mapping():
     # Senior Infrastructure Engineer
     r1 = BenchmarkNormalizer.normalize_role("Senior Systems Infrastructure Engineer")
     assert r1.job_family == JobFamily.SYSTEMS_INFRASTRUCTURE
-    assert r1.job_level == JobLevel.L5
+    assert r1.job_level == JobLevel.IC3
     assert r1.radford_level == RadfordLevel.P3
 
     # Staff Machine Learning Engineer
     r2 = BenchmarkNormalizer.normalize_role("Staff Machine Learning Platform Engineer")
     assert r2.job_family == JobFamily.MACHINE_LEARNING
-    assert r2.job_level == JobLevel.L6
+    assert r2.job_level == JobLevel.IC4
     assert r2.radford_level == RadfordLevel.P4
 
     # Principal Software Engineer
     r3 = BenchmarkNormalizer.normalize_role("Principal Software Architect")
     assert r3.job_family == JobFamily.SOFTWARE_ENGINEERING
-    assert r3.job_level == JobLevel.L8
+    assert r3.job_level == JobLevel.IC6
     assert r3.radford_level == RadfordLevel.P6
 
     # Associate Product Manager
     r4 = BenchmarkNormalizer.normalize_role("Associate Product Manager")
     assert r4.job_family == JobFamily.PRODUCT_MANAGEMENT
-    assert r4.job_level == JobLevel.L3
+    assert r4.job_level == JobLevel.IC1
     assert r4.radford_level == RadfordLevel.P1
 
 
@@ -138,21 +138,21 @@ def test_survey_aging_compound_formula():
 def test_monotonic_smoothing():
     """Verifies monotonic correction when higher levels have noisy sample data."""
     level_data = {
-        "L3": BenchmarkPercentiles(
+        "IC1": BenchmarkPercentiles(
             p10_base=Decimal("120000"),
             p25_base=Decimal("140000"),
             p50_base=Decimal("160000"),
             p75_base=Decimal("180000"),
             p90_base=Decimal("200000"),
         ),
-        "L4": BenchmarkPercentiles(
+        "IC2": BenchmarkPercentiles(
             p10_base=Decimal("110000"),
             p25_base=Decimal("130000"),
             p50_base=Decimal("150000"),
             p75_base=Decimal("170000"),
             p90_base=Decimal("190000"),
         ),  # Inverted!
-        "L5": BenchmarkPercentiles(
+        "IC3": BenchmarkPercentiles(
             p10_base=Decimal("180000"),
             p25_base=Decimal("210000"),
             p50_base=Decimal("240000"),
@@ -161,8 +161,8 @@ def test_monotonic_smoothing():
         ),
     }
     smoothed = BenchmarkStatisticalEngine.smooth_level_monotonicity(level_data)
-    assert smoothed["L4"].p50_base >= smoothed["L3"].p50_base
-    assert smoothed["L5"].p50_base >= smoothed["L4"].p50_base
+    assert smoothed["IC2"].p50_base >= smoothed["IC1"].p50_base
+    assert smoothed["IC3"].p50_base >= smoothed["IC2"].p50_base
 
 
 # --- DOL Parser Tests ---
@@ -207,7 +207,7 @@ def test_benchmark_service_compare():
     sample_benchmark = MarketBenchmark(
         soc_code="15-1252.00",
         job_family=JobFamily.SOFTWARE_ENGINEERING,
-        job_level=JobLevel.L5,
+        job_level=JobLevel.IC3,
         radford_level=RadfordLevel.P3,
         geo_tier=LocationTier.US_ZONE_1,
         p10_base=Decimal("205000.00"),
@@ -272,14 +272,14 @@ async def test_end_to_end_etl_pipeline_with_db():
 
         # 2. Query benchmark via BenchmarkService
         service = BenchmarkService(session)
-        l6_bench = await service.get_benchmark(
+        ic4_bench = await service.get_benchmark(
             job_family=JobFamily.SYSTEMS_INFRASTRUCTURE,
-            job_level=JobLevel.L6,
+            job_level=JobLevel.IC4,
             geo_tier=LocationTier.US_ZONE_1,
         )
-        assert l6_bench is not None
-        assert l6_bench.radford_level == RadfordLevel.P4
-        assert l6_bench.p50_base == Decimal("330000.00")
+        assert ic4_bench is not None
+        assert ic4_bench.radford_level == RadfordLevel.P4
+        assert ic4_bench.p50_base == Decimal("330000.00")
 
         # 3. Ingest raw DOL LCA CSV rows
         dol_sample = """CASE_NUMBER,EMPLOYER_NAME,JOB_TITLE,SOC_CODE,WAGE_RATE_OF_PAY_FROM,WAGE_UNIT_OF_PAY,WORKSITE_CITY,WORKSITE_STATE,DECISION_DATE
@@ -292,7 +292,7 @@ I-200-05,CLOUD CORP,Principal Systems Architect,15-1244.00,415000,Year,San Franc
         ingested = await pipeline.ingest_dol_lca_csv(dol_sample)
         assert len(ingested) == 1
         assert ingested[0].job_family == JobFamily.SYSTEMS_INFRASTRUCTURE
-        assert ingested[0].job_level == JobLevel.L8
+        assert ingested[0].job_level == JobLevel.IC6
         assert ingested[0].sample_size == 5
 
     await engine.dispose()

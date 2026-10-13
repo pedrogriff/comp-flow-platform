@@ -12,14 +12,14 @@ from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class JobLevel(StrEnum):
-    """Corporate and engineering levels."""
+    """Synthetic IC levels."""
 
-    L3 = "L3"
-    L4 = "L4"
-    L5 = "L5"
-    L6 = "L6"
-    L7 = "L7"
-    L8 = "L8"
+    IC1 = "IC1"
+    IC2 = "IC2"
+    IC3 = "IC3"
+    IC4 = "IC4"
+    IC5 = "IC5"
+    IC6 = "IC6"
 
 
 class JobFamily(StrEnum):

@@ -28,8 +28,8 @@ class TestAgentOrchestrator(unittest.TestCase):
         """Verifies compliant employee review is AUTO_APPROVED."""
         audit = self.review_agent.audit_review_proposal(
             review_id="REV-100",
-            current_level=JobLevel.L5,
-            proposed_level=JobLevel.L5,
+            current_level=JobLevel.IC3,
+            proposed_level=JobLevel.IC3,
             job_family=JobFamily.SOFTWARE_ENGINEERING,
             location_tier=LocationTier.US_ZONE_1,
             current_base=Decimal("230000.00"),
@@ -49,8 +49,8 @@ class TestAgentOrchestrator(unittest.TestCase):
         """Verifies out-of-band equity grant requires VP exception."""
         audit = self.review_agent.audit_review_proposal(
             review_id="REV-101",
-            current_level=JobLevel.L5,
-            proposed_level=JobLevel.L5,
+            current_level=JobLevel.IC3,
+            proposed_level=JobLevel.IC3,
             job_family=JobFamily.SOFTWARE_ENGINEERING,
             location_tier=LocationTier.US_ZONE_1,
             current_base=Decimal("230000.00"),
@@ -69,8 +69,8 @@ class TestAgentOrchestrator(unittest.TestCase):
         """Verifies salary increase for Needs Improvement rating is REJECTED."""
         audit = self.review_agent.audit_review_proposal(
             review_id="REV-102",
-            current_level=JobLevel.L4,
-            proposed_level=JobLevel.L4,
+            current_level=JobLevel.IC2,
+            proposed_level=JobLevel.IC2,
             job_family=JobFamily.SOFTWARE_ENGINEERING,
             location_tier=LocationTier.US_ZONE_1,
             current_base=Decimal("180000.00"),
@@ -89,7 +89,7 @@ class TestAgentOrchestrator(unittest.TestCase):
         """Verifies compliant candidate offer is approved."""
         audit = self.offer_agent.audit_offer_package(
             offer_id="OFF-201",
-            job_level=JobLevel.L5,
+            job_level=JobLevel.IC3,
             job_family=JobFamily.SOFTWARE_ENGINEERING,
             location_tier=LocationTier.US_ZONE_1,
             proposed_base=Decimal("245000.00"),  # Compa ~0.980
@@ -104,7 +104,7 @@ class TestAgentOrchestrator(unittest.TestCase):
         """Verifies high sign-on bonus ($75k) requires VP exception."""
         audit = self.offer_agent.audit_offer_package(
             offer_id="OFF-202",
-            job_level=JobLevel.L6,
+            job_level=JobLevel.IC4,
             job_family=JobFamily.SOFTWARE_ENGINEERING,
             location_tier=LocationTier.US_ZONE_1,
             proposed_base=Decimal("310000.00"),
