@@ -41,7 +41,6 @@ class AnalyticsService:
                 "total_merit_spend": "0.00",
                 "total_bonus_spend": "0.00",
                 "total_equity_rsus": 0,
-                "total_equity_gsus": 0,
             }
 
         # Status Breakdown
@@ -105,5 +104,4 @@ class AnalyticsService:
             "total_merit_spend": str(total_merit_spend),
             "total_bonus_spend": str(total_bonus_spend),
             "total_equity_rsus": total_equity_rsus,
-            "total_equity_gsus": total_equity_rsus,
         }

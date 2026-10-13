@@ -38,7 +38,7 @@ class BandService:
             job_level.value, job_family.value, location_tier.value
         )
         if cached:
-            eq = int(cached.get("target_equity_rsus") or cached.get("target_equity_gsus") or 0)
+            eq = int(cached.get("target_equity_rsus") or 0)
             return SalaryBandBase(
                 job_level=JobLevel(cached["job_level"]),
                 job_family=JobFamily(cached["job_family"]),
@@ -96,7 +96,6 @@ class BandService:
             "mid_base": str(band_schema.mid_base),
             "max_base": str(band_schema.max_base),
             "target_equity_rsus": band_schema.target_equity_rsus,
-            "target_equity_gsus": band_schema.target_equity_rsus,
             "target_bonus_pct": str(band_schema.target_bonus_pct),
         }
         await redis_client.cache_band(
@@ -155,7 +154,6 @@ class BandService:
             "mid_base": str(band_in.mid_base),
             "max_base": str(band_in.max_base),
             "target_equity_rsus": band_in.target_equity_rsus,
-            "target_equity_gsus": band_in.target_equity_rsus,
             "target_bonus_pct": str(band_in.target_bonus_pct),
         }
         await redis_client.cache_band(

@@ -20,11 +20,11 @@ class NegotiationService:
     """Calculates multi-year compensation comparisons, unvested equity buyouts, and acceptance elasticity."""
 
     VESTING_SCHEDULE_MAP: dict[VestingScheduleType, tuple[Decimal, Decimal, Decimal, Decimal]] = {
-        VestingScheduleType.ENTERPRISE_FRONT_LOADED_33_33_22_12: (
-            Decimal("0.33"),
-            Decimal("0.33"),
-            Decimal("0.22"),
-            Decimal("0.12"),
+        VestingScheduleType.ENTERPRISE_FRONT_LOADED_35_30_20_15: (
+            Decimal("0.35"),
+            Decimal("0.30"),
+            Decimal("0.20"),
+            Decimal("0.15"),
         ),
         VestingScheduleType.STANDARD_FOUR_YEAR_EQUAL_25: (
             Decimal("0.25"),
@@ -55,7 +55,7 @@ class NegotiationService:
         """Simulates candidate counter-offer dynamics across 4 years with win-rate elasticity."""
         our_sched = cls.VESTING_SCHEDULE_MAP.get(
             our_offer.vesting_schedule,
-            cls.VESTING_SCHEDULE_MAP[VestingScheduleType.ENTERPRISE_FRONT_LOADED_33_33_22_12],
+            cls.VESTING_SCHEDULE_MAP[VestingScheduleType.STANDARD_FOUR_YEAR_EQUAL_25],
         )
         comp_sched = cls.VESTING_SCHEDULE_MAP.get(
             competing_offer.vesting_schedule,
@@ -222,7 +222,7 @@ class NegotiationService:
 
         # Front-loaded vesting bonus
         z_schedule = 0.0
-        if our_sched == VestingScheduleType.ENTERPRISE_FRONT_LOADED_33_33_22_12:
+        if our_sched == VestingScheduleType.ENTERPRISE_FRONT_LOADED_35_30_20_15:
             if comp_sched in (
                 VestingScheduleType.STANDARD_FOUR_YEAR_EQUAL_25,
                 VestingScheduleType.BACK_LOADED_5_15_40_40,
@@ -308,9 +308,9 @@ class NegotiationService:
         points: list[str] = []
 
         # Vesting schedule advantage
-        if our_offer.vesting_schedule == VestingScheduleType.ENTERPRISE_FRONT_LOADED_33_33_22_12:
+        if our_offer.vesting_schedule == VestingScheduleType.ENTERPRISE_FRONT_LOADED_35_30_20_15:
             points.append(
-                "Front-Loaded Equity Advantage: Our enterprise 33/33/22/12 schedule vests 66% of your grant "
+                "Front-Loaded Equity Advantage: Our enterprise 35/30/20/15 schedule vests 65% of your grant "
                 "within the first 24 months, accelerating your liquidity and derisking market volatility "
                 f"compared to {competing_offer.competitor_name}'s standard linear schedule."
             )

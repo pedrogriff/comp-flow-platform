@@ -1,7 +1,7 @@
 """Create SOX Section 404 Cryptographic Audit Ledger Table
 
 Revision ID: 004_sox_audit_ledger
-Revises: 003_rename_gsu_to_rsu
+Revises: 002_market_benchmarks
 Create Date: 2026-09-09 10:30:00.000000
 
 """
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 revision: str = "004_sox_audit_ledger"
-down_revision: str | None = "003_rename_gsu_to_rsu"
+down_revision: str | None = "002_market_benchmarks"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

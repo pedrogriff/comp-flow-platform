@@ -213,8 +213,6 @@ def evaluate_equity_guidelines(
     **kwargs: Any,
 ) -> AuditFinding:
     """Evaluates proposed RSU equity grant against target guidelines adjusted for performance."""
-    if "proposed_gsus" in kwargs and not proposed_rsus:
-        proposed_rsus = int(kwargs["proposed_gsus"])
     target = band.target_equity_rsus
     min_mult, max_mult = EQUITY_PERFORMANCE_MULTIPLIERS[rating]
     min_allowed = int(Decimal(target) * min_mult)
@@ -349,8 +347,6 @@ def evaluate_candidate_offer_compliance(
     **kwargs: Any,
 ) -> list[AuditFinding]:
     """Runs compliance checks on candidate new hire offer package."""
-    if "proposed_equity_gsus" in kwargs and not proposed_equity_rsus:
-        proposed_equity_rsus = int(kwargs["proposed_equity_gsus"])
 
     findings: list[AuditFinding] = []
 
@@ -414,19 +410,15 @@ def calculate_offer_total_comp(
     **kwargs: Any,
 ) -> dict[str, Decimal]:
     """Calculates Total Target Cash and First Year Total Direct Comp for an offer."""
-    if "proposed_equity_gsus" in kwargs and not proposed_equity_rsus:
-        proposed_equity_rsus = int(kwargs["proposed_equity_gsus"])
-    if "estimated_gsu_price" in kwargs:
-        estimated_rsu_price = Decimal(str(kwargs["estimated_gsu_price"]))
 
     target_bonus = (proposed_base * target_bonus_pct / Decimal("100.0")).quantize(
         Decimal("0.01"), rounding=ROUND_HALF_UP
     )
     total_target_cash = proposed_base + target_bonus
 
-    # Standard Year 1 Front-loaded equity tranche (33.33%)
+    # Year 1 equity tranche under the standard 4-year schedule (25%)
     year_1_equity_val = (
-        Decimal(proposed_equity_rsus) * Decimal("0.33333333") * estimated_rsu_price
+        Decimal(proposed_equity_rsus) * Decimal("0.25") * estimated_rsu_price
     ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
     first_year_total_comp = proposed_base + sign_on_bonus + target_bonus + year_1_equity_val

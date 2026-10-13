@@ -8,7 +8,7 @@ from enum import StrEnum
 from typing import Any
 from uuid import UUID
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class JobLevel(StrEnum):
@@ -191,14 +191,8 @@ class SalaryBandBase(BaseModel):
     min_base: Decimal = Field(gt=0)
     mid_base: Decimal = Field(gt=0)
     max_base: Decimal = Field(gt=0)
-    target_equity_rsus: int = Field(
-        ge=0, validation_alias=AliasChoices("target_equity_rsus", "target_equity_gsus")
-    )
+    target_equity_rsus: int = Field(ge=0)
     target_bonus_pct: Decimal = Field(default=Decimal("15.0"), ge=0, le=100)
-
-    @property
-    def target_equity_gsus(self) -> int:
-        return self.target_equity_rsus
 
 
 class SalaryBandCreate(SalaryBandBase):
@@ -228,13 +222,8 @@ class EmployeeBase(BaseModel):
     current_equity_rsus: int = Field(
         default=0,
         ge=0,
-        validation_alias=AliasChoices("current_equity_rsus", "current_equity_gsus"),
     )
     last_performance_rating: PerformanceRating = PerformanceRating.RATING_2
-
-    @property
-    def current_equity_gsus(self) -> int:
-        return self.current_equity_rsus
 
 
 class EmployeeCreate(EmployeeBase):
@@ -313,14 +302,9 @@ class EmployeeReviewProposalBase(BaseModel):
     proposed_equity_rsus: int = Field(
         default=0,
         ge=0,
-        validation_alias=AliasChoices("proposed_equity_rsus", "proposed_equity_gsus"),
     )
     performance_rating: PerformanceRating
     justification_notes: str = ""
-
-    @property
-    def proposed_equity_gsus(self) -> int:
-        return self.proposed_equity_rsus
 
 
 class EmployeeReviewProposalCreate(EmployeeReviewProposalBase):
@@ -334,14 +318,9 @@ class EmployeeReviewProposalUpdate(BaseModel):
     individual_multiplier: Decimal | None = None
     proposed_equity_rsus: int | None = Field(
         default=None,
-        validation_alias=AliasChoices("proposed_equity_rsus", "proposed_equity_gsus"),
     )
     performance_rating: PerformanceRating | None = None
     justification_notes: str | None = None
-
-    @property
-    def proposed_equity_gsus(self) -> int | None:
-        return self.proposed_equity_rsus
 
 
 class EmployeeReviewProposalResponse(EmployeeReviewProposalBase):
@@ -374,14 +353,9 @@ class CandidateOfferBase(BaseModel):
     proposed_equity_rsus: int = Field(
         default=0,
         ge=0,
-        validation_alias=AliasChoices("proposed_equity_rsus", "proposed_equity_gsus"),
     )
     target_start_date: date
     notes: str = ""
-
-    @property
-    def proposed_equity_gsus(self) -> int:
-        return self.proposed_equity_rsus
 
 
 class CandidateOfferCreate(CandidateOfferBase):
@@ -395,14 +369,9 @@ class CandidateOfferUpdate(BaseModel):
     sign_on_bonus: Decimal | None = None
     proposed_equity_rsus: int | None = Field(
         default=None,
-        validation_alias=AliasChoices("proposed_equity_rsus", "proposed_equity_gsus"),
     )
     target_start_date: date | None = None
     notes: str | None = None
-
-    @property
-    def proposed_equity_gsus(self) -> int | None:
-        return self.proposed_equity_rsus
 
 
 class CandidateOfferResponse(CandidateOfferBase):

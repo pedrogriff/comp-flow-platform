@@ -53,8 +53,6 @@ class EmployeeCalibrationAgent:
         **kwargs: Any,
     ) -> AgentAuditResult:
         """Audits proposed merit, bonus, equity, and promotion against internal benchmarks."""
-        if "proposed_equity_gsus" in kwargs and not proposed_equity_rsus:
-            proposed_equity_rsus = int(kwargs["proposed_equity_gsus"])
 
         t0 = time.perf_counter()
 
@@ -178,8 +176,6 @@ class OfferApprovalAgent:
         **kwargs: Any,
     ) -> AgentAuditResult:
         """Audits candidate offer package against location-tiered bands and sign-on/equity caps."""
-        if "proposed_equity_gsus" in kwargs and not proposed_equity_rsus:
-            proposed_equity_rsus = int(kwargs["proposed_equity_gsus"])
 
         t0 = time.perf_counter()
 

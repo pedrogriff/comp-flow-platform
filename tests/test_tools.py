@@ -204,8 +204,8 @@ class TestCompensationTools(unittest.TestCase):
         )
         self.assertEqual(totals["target_bonus"], Decimal("30000.00"))
         self.assertEqual(totals["total_target_cash"], Decimal("230000.00"))
-        # First year total comp = 200k + 30k + 30k + (1200 * 0.33333333 * 150 = ~60,000) = $320,000.00
-        self.assertEqual(totals["first_year_total_comp"], Decimal("320000.00"))
+        # First year total comp = 200k + 30k + 30k + (1200 * 0.25 * 150 = 45,000) = $305,000.00
+        self.assertEqual(totals["first_year_total_comp"], Decimal("305000.00"))
 
     def test_market_benchmark_positioning(self) -> None:
         """Verifies market benchmark percentile alignment evaluation."""

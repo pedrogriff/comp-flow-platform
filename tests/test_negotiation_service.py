@@ -18,14 +18,14 @@ from comp_flow.service.negotiation_service import NegotiationService
 
 
 def test_simulate_counter_offer_front_loaded_advantage():
-    """Verifies enterprise 33/33/22/12 vesting produces superior Year 1 and Year 2 cash/equity flow."""
+    """Verifies enterprise 35/30/20/15 vesting produces superior Year 1 and Year 2 cash/equity flow."""
     our_offer = OurOfferInput(
         base_salary=Decimal("220000.00"),
         target_bonus_pct=Decimal("15.00"),
         signon_bonus=Decimal("30000.00"),
         equity_rsus_4yr=1600,
-        share_price_estimate=Decimal("100.00"),  # $160k equity total ($52.8k Yr 1)
-        vesting_schedule=VestingScheduleType.ENTERPRISE_FRONT_LOADED_33_33_22_12,
+        share_price_estimate=Decimal("100.00"),  # $160k equity total ($56k Yr 1)
+        vesting_schedule=VestingScheduleType.ENTERPRISE_FRONT_LOADED_35_30_20_15,
         job_level=JobLevel.IC3,
         job_family=JobFamily.SOFTWARE_ENGINEERING,
         location_tier=LocationTier.US_ZONE_1,
@@ -44,11 +44,11 @@ def test_simulate_counter_offer_front_loaded_advantage():
 
     result = NegotiationService.simulate_counter_offer(our_offer, competing_offer)
 
-    # Year 1 equity: Our 33% = $52,800 vs Comp 25% = $40,000
-    assert result.year_by_year[0].our_equity_value == Decimal("52800.00")
+    # Year 1 equity: Our 35% = $56,000 vs Comp 25% = $40,000
+    assert result.year_by_year[0].our_equity_value == Decimal("56000.00")
     assert result.year_by_year[0].comp_equity_value == Decimal("40000.00")
 
-    # Year 1 TDC delta includes +$10k signon and +$12.8k equity = +$22.8k
+    # Year 1 TDC delta includes +$10k signon and +$16k equity = +$26k
     assert result.first_year_tdc_delta > Decimal("20000.00")
     assert result.predicted_win_rate_pct >= Decimal("65.0")
     assert result.win_rate_tier in (WinRateTier.HIGHLY_COMPETITIVE, WinRateTier.COMPETITIVE)
@@ -98,7 +98,7 @@ def test_back_loaded_competitor_comparison():
         signon_bonus=Decimal("25000.00"),
         equity_rsus_4yr=2000,
         share_price_estimate=Decimal("100.00"),  # $200k equity
-        vesting_schedule=VestingScheduleType.ENTERPRISE_FRONT_LOADED_33_33_22_12,
+        vesting_schedule=VestingScheduleType.ENTERPRISE_FRONT_LOADED_35_30_20_15,
     )
     backloaded_comp = CompetingOfferInput(
         competitor_name="Enterprise Cloud Co",
@@ -110,10 +110,10 @@ def test_back_loaded_competitor_comparison():
     )
 
     res = NegotiationService.simulate_counter_offer(our_offer, backloaded_comp)
-    # Our Yr 1 equity = $66,000 vs Comp Yr 1 equity = $10,000
-    assert res.year_by_year[0].our_equity_value == Decimal("66000.00")
+    # Our Yr 1 equity = $70,000 vs Comp Yr 1 equity = $10,000
+    assert res.year_by_year[0].our_equity_value == Decimal("70000.00")
     assert res.year_by_year[0].comp_equity_value == Decimal("10000.00")
-    assert res.first_year_tdc_delta >= Decimal("56000.00")
+    assert res.first_year_tdc_delta >= Decimal("60000.00")
     assert res.predicted_win_rate_pct >= Decimal("78.0")
     assert res.win_rate_tier in (WinRateTier.HIGHLY_COMPETITIVE, WinRateTier.COMPETITIVE)
 
@@ -128,7 +128,7 @@ async def test_counter_offer_api_endpoint(async_client: AsyncClient):
             "signon_bonus": "40000.00",
             "equity_rsus_4yr": 1500,
             "share_price_estimate": "100.00",
-            "vesting_schedule": "ENTERPRISE_FRONT_LOADED_33_33_22_12",
+            "vesting_schedule": "ENTERPRISE_FRONT_LOADED_35_30_20_15",
         },
         "competing_offer": {
             "competitor_name": "Snowflake",

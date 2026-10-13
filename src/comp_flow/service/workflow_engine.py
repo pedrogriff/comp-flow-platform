@@ -38,10 +38,6 @@ class InMemProposal:
     manager_notes: str = ""
     audit_result: AgentAuditResult | None = None
 
-    @property
-    def proposed_equity_gsus(self) -> int:
-        return self.proposed_equity_rsus
-
 
 class CompensationWorkflowEngine:
     """High-performance in-memory service for batch audits and throughput benchmarking."""

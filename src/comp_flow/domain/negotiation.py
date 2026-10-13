@@ -13,8 +13,8 @@ from comp_flow.domain.models import JobFamily, JobLevel, LocationTier
 class VestingScheduleType(StrEnum):
     """Standardized tech vesting schedule archetypes."""
 
-    ENTERPRISE_FRONT_LOADED_33_33_22_12 = (
-        "ENTERPRISE_FRONT_LOADED_33_33_22_12"  # 33% / 33% / 22% / 12%
+    ENTERPRISE_FRONT_LOADED_35_30_20_15 = (
+        "ENTERPRISE_FRONT_LOADED_35_30_20_15"  # 35% / 30% / 20% / 15%
     )
     STANDARD_FOUR_YEAR_EQUAL_25 = "STANDARD_FOUR_YEAR_EQUAL_25"  # 25% / 25% / 25% / 25%
     BACK_LOADED_5_15_40_40 = "BACK_LOADED_5_15_40_40"  # 5% / 15% / 40% / 40%
@@ -75,7 +75,7 @@ class OurOfferInput(BaseModel):
         default=Decimal("100.00"), gt=0, description="Assumed internal company share valuation"
     )
     vesting_schedule: VestingScheduleType = Field(
-        default=VestingScheduleType.ENTERPRISE_FRONT_LOADED_33_33_22_12,
+        default=VestingScheduleType.STANDARD_FOUR_YEAR_EQUAL_25,
         description="Our company's vesting schedule",
     )
     job_level: JobLevel = Field(default=JobLevel.IC3, description="Candidate job level")
