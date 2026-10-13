@@ -239,5 +239,5 @@ stateDiagram-v2
 
 * **Fixed-Point Precision**: Fixed-point arithmetic (`Decimal`) ensures 0 rounding drift across enterprise payroll calculations.
 * **Audit Trail**: Every state transition and decision is immutably recorded in `audit_logs`.
-* **Throughput Benchmark**: Achieves **20,107.3 proposals/second** in batch calibration audits.
+* **Throughput Benchmark**: Run `python -m benchmarks.bench_agent_throughput` and see the benchmark for numbers on your machine.
 * **Strict Code Quality**: Zero Ruff linter warnings, 100% strict MyPy type safety, and comprehensive pytest test coverage across unit, state machine, and integration layers.

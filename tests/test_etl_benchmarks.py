@@ -171,19 +171,19 @@ def test_monotonic_smoothing():
 def test_dol_lca_csv_parser():
     """Verifies extraction and normalization of DOL OFLC CSV rows."""
     sample_csv = """CASE_NUMBER,EMPLOYER_NAME,JOB_TITLE,SOC_CODE,WAGE_RATE_OF_PAY_FROM,WAGE_UNIT_OF_PAY,WORKSITE_CITY,WORKSITE_STATE,DECISION_DATE
-I-200-24001-001,GOOGLE LLC,Staff Software Engineer,15-1252.00,310000,Year,Mountain View,CA,2025-04-15
-I-200-24001-002,META PLATFORMS INC,Senior Infrastructure Engineer,15-1244.00,265000,Year,Seattle,WA,2025-05-10
-I-200-24001-003,AMAZON.COM SERVICES LLC,Software Development Engineer II,15-1252.00,95.50,Hour,Austin,TX,2025-06-01
+I-200-24001-001,COMPANY A,Staff Software Engineer,15-1252.00,310000,Year,San Jose,CA,2025-04-15
+I-200-24001-002,COMPANY B,Senior Infrastructure Engineer,15-1244.00,265000,Year,Seattle,WA,2025-05-10
+I-200-24001-003,COMPANY C,Software Development Engineer II,15-1252.00,95.50,Hour,Austin,TX,2025-06-01
 """
     records = DOLLCAParser.parse_csv_stream(sample_csv)
     assert len(records) == 3
 
-    # Google Record
-    assert records[0].employer_name == "GOOGLE LLC"
+    # Company A record
+    assert records[0].employer_name == "COMPANY A"
     assert records[0].wage_rate == Decimal("310000.00")
 
-    # Amazon Record (Hourly $95.50 * 2080 = $198,640)
-    assert records[2].employer_name == "AMAZON.COM SERVICES LLC"
+    # Company C record (Hourly $95.50 * 2080 = $198,640)
+    assert records[2].employer_name == "COMPANY C"
     assert records[2].wage_rate == Decimal("198640.00")
 
 

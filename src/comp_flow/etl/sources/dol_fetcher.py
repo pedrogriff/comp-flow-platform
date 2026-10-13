@@ -33,7 +33,7 @@ class DOLLiveFetcher:
 
         If url is provided, attempts an HTTP chunked streaming download.
         If url is None or network request fails, falls back gracefully to the
-        bundled authentic 2025-2026 tech disclosure dataset.
+        bundled synthetic 2025-2026 tech disclosure sample.
         """
         if url and url.lower() not in ("default", "local", "bundled"):
             try:
@@ -56,10 +56,10 @@ class DOLLiveFetcher:
             except Exception as exc:
                 logger.warning(
                     f"Unable to stream directly from remote URL {url} ({exc}). "
-                    f"Falling back to curated 2025-2026 certified LCA tech disclosure dataset."
+                    f"Falling back to the bundled synthetic LCA sample."
                 )
 
-        # Fallback to local verified dataset
+        # Fallback to the bundled synthetic sample
         for line in self.stream_lines_from_file(CURATED_DATASET_PATH):
             yield line
 

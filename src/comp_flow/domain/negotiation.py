@@ -36,7 +36,7 @@ class CompetingOfferInput(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     competitor_name: str = Field(
-        ..., description="Name of competing employer (e.g. Stripe, Datadog)"
+        ..., description="Name of competing employer (e.g. Competitor A, Competitor B)"
     )
     base_salary: Decimal = Field(..., ge=0, description="Competing annual base salary")
     target_bonus_pct: Decimal = Field(default=Decimal("15.00"), ge=0, description="Target bonus %")

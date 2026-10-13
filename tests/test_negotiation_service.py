@@ -32,7 +32,7 @@ def test_simulate_counter_offer_front_loaded_advantage():
     )
 
     competing_offer = CompetingOfferInput(
-        competitor_name="Datadog",
+        competitor_name="Competitor A",
         base_salary=Decimal("220000.00"),
         target_bonus_pct=Decimal("15.00"),
         signon_bonus=Decimal("20000.00"),
@@ -65,7 +65,7 @@ def test_unvested_equity_forfeiture_buyout_bridge():
         share_price_estimate=Decimal("100.00"),
     )
     comp_with_forfeit = CompetingOfferInput(
-        competitor_name="Stripe",
+        competitor_name="Competitor B",
         base_salary=Decimal("200000.00"),
         signon_bonus=Decimal("0.00"),
         equity_rsus_4yr=1000,
@@ -131,7 +131,7 @@ async def test_counter_offer_api_endpoint(async_client: AsyncClient):
             "vesting_schedule": "ENTERPRISE_FRONT_LOADED_35_30_20_15",
         },
         "competing_offer": {
-            "competitor_name": "Snowflake",
+            "competitor_name": "Competitor C",
             "base_salary": "225000.00",
             "target_bonus_pct": "15.00",
             "signon_bonus": "20000.00",

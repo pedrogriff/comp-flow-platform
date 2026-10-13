@@ -8,7 +8,7 @@
 [![GitOps: ArgoCD](https://img.shields.io/badge/GitOps-ArgoCD-orange.svg)](https://github.com/pedrogriff/homelab-k8s-talos)
 [![Kubernetes: Talos](https://img.shields.io/badge/Kubernetes-Talos%20Baremetal-blue.svg)](https://github.com/pedrogriff/homelab-k8s-talos)
 
-**CompFlow Platform** is a distributed, production-grade **Total Rewards Calibration & Offer Orchestration Microservice**. It combines deterministic policy auditing, dual-lifecycle state machines, and executive decision synthesis to govern:
+**CompFlow Platform** is a distributed **Total Rewards Calibration & Offer Orchestration Microservice**. It combines deterministic policy auditing, dual-lifecycle state machines, and executive decision synthesis to govern:
 1. **Current Employee Annual Compensation Planning Cycles**: Salary Merit Increase matrices, Bonus allocations ($\text{Base} \times \text{Target\%} \times \text{individual multiplier} \times \text{company multiplier}$), Equity Refresh grants, Promotion calibrations, and Departmental Budget Pool depletion.
 2. **New Hire Candidate Offer Generation & Approvals**: Location-tiered salary band enforcement (`US_ZONE_1`, `US_ZONE_2`, `US_ZONE_3`), sign-on bonus caps ($50,000 threshold), new hire equity caps, and multi-tier approval routing.
 3. **Cloud-Native GitOps & Observability**: PostgreSQL 16 schema with Alembic async migrations, Redis 7 caching & atomic counters, Ingress-NGINX with cert-manager TLS, Prometheus metrics `/metrics`, and ArgoCD GitOps deployment on a bare-metal Talos Kubernetes homelab.
@@ -77,8 +77,8 @@ flowchart TD
    - Real-time atomic budget burn rate tracking across departments.
 4. **JWT Authentication & Fine-Grained RBAC**:
    - Enforces distinct permissions for `HR_ADMIN`, `COMPENSATION_PARTNER`, `PEOPLE_MANAGER`, `EXECUTIVE_APPROVER`, and `RECRUITER`.
-5. **Ultra High-Throughput Performance**:
-   - Audits **20,000+ complex manager proposals per second** with full rationale synthesis.
+5. **Throughput Benchmark**:
+   - Run `python -m benchmarks.bench_agent_throughput` and see the benchmark for numbers on your machine.
 
 ---
 
@@ -186,7 +186,7 @@ compflow-cli tse-triage --review-id b18d9a4c-6d74-4f03-91ee-abd372d230e7 --json
 ```
 
 ### 2. Cryptographically Sealed SOX Section 404 Audit Ledger
-To guarantee non-repudiation and prevent undetected administrative tampering in enterprise compensation runs:
+To make administrative tampering in compensation runs detectable:
 - **Merkle Hash-Chained Blocks**: Every audit event, salary override, and approval action is hashed using canonical JSON (RFC 8785 subset) and chained to the previous block's SHA-256 hash.
 - **Platform HMAC Non-Repudiation Signatures**: Each block header is signed with platform cryptographic keys.
 - **Instant Tamper Detection**: Any direct SQL update (`UPDATE sox_audit_ledger SET payload = ...`) immediately invalidates the Merkle chain, allowing automated SRE monitors to freeze payout disbursements.

@@ -35,8 +35,8 @@ class JobFamily(StrEnum):
 class LocationTier(StrEnum):
     """Geographic compensation tiers."""
 
-    US_ZONE_1 = "US_ZONE_1"  # SF Bay Area, NYC
-    US_ZONE_2 = "US_ZONE_2"  # Seattle, Austin, Boston
+    US_ZONE_1 = "US_ZONE_1"  # Highest-cost US metro areas
+    US_ZONE_2 = "US_ZONE_2"  # Mid-cost US metro areas
     US_ZONE_3 = "US_ZONE_3"  # National / Remote / Other US
 
 

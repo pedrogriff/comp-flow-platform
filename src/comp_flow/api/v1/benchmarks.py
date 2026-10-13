@@ -144,7 +144,7 @@ class LiveDOLIngestRequest(BaseModel):
 
     source_url: str | None = Field(
         default=None,
-        description="Optional remote URL to stream disclosure data from (falls back to curated 2025-2026 tech dataset)",
+        description="Optional remote URL to stream disclosure data from (falls back to the bundled synthetic sample)",
     )
     fiscal_year: int = Field(default=2026, description="Fiscal year target")
     limit_records: int | None = Field(

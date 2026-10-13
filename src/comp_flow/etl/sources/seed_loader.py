@@ -15,7 +15,7 @@ from comp_flow.etl.normalizer import BenchmarkNormalizer
 class BenchmarkSeedLoader:
     """Generates comprehensive market benchmarks spanning all engineering families and levels."""
 
-    # Baseline Zone 1 (SF Bay Area / NYC) P50 Base Salaried Ranges (2026 Tech Market)
+    # Baseline Zone 1 P50 Base Salaried Ranges (2026 Tech Market)
     BASELINE_ZONE_1: dict[tuple[JobFamily, JobLevel], dict[str, Any]] = {
         # Software Engineering
         (JobFamily.SOFTWARE_ENGINEERING, JobLevel.IC1): {
@@ -356,8 +356,8 @@ class BenchmarkSeedLoader:
 
     # Geo Tier Multipliers
     GEO_MULTIPLIERS = {
-        LocationTier.US_ZONE_1: Decimal("1.00"),  # SF / NYC
-        LocationTier.US_ZONE_2: Decimal("0.90"),  # Seattle / Austin / Boston
+        LocationTier.US_ZONE_1: Decimal("1.00"),  # Zone 1
+        LocationTier.US_ZONE_2: Decimal("0.90"),  # Zone 2
         LocationTier.US_ZONE_3: Decimal("0.80"),  # National / Remote
     }
 

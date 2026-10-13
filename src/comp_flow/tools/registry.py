@@ -25,8 +25,8 @@ EQUITY_PERFORMANCE_MULTIPLIERS: dict[PerformanceRating, tuple[Decimal, Decimal]]
 
 # Location Tier Cost of Labor Adjustment Factors
 GEO_FACTORS: dict[LocationTier, Decimal] = {
-    LocationTier.US_ZONE_1: Decimal("1.00"),  # SF Bay Area, NYC (100% Benchmark)
-    LocationTier.US_ZONE_2: Decimal("0.90"),  # Seattle, Austin (90% Benchmark)
+    LocationTier.US_ZONE_1: Decimal("1.00"),  # Zone 1 (100% Benchmark)
+    LocationTier.US_ZONE_2: Decimal("0.90"),  # Zone 2 (90% Benchmark)
     LocationTier.US_ZONE_3: Decimal("0.80"),  # Remote / National (80% Benchmark)
 }
 
